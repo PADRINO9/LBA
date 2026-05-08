@@ -1,5 +1,5 @@
-import FinancialDiagnosticLanding from "@/components/FinancialDiagnosticLanding";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <FinancialDiagnosticLanding />;
+  redirect("/stress-test");
 }

@@ -1,24 +1,27 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        paper: "#F7F3EC",
-        ink: "#1E2424",
-        muted: "#6F6A61",
-        accent: "#1A5866",
-        "accent-dark": "#103A44",
-        line: "#E5DDD2",
+        paper: "rgb(var(--color-paper) / <alpha-value>)",
+        surface: "rgb(var(--color-surface) / <alpha-value>)",
+        ink: "rgb(var(--color-ink) / <alpha-value>)",
+        muted: "rgb(var(--color-muted) / <alpha-value>)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
+        "accent-dark": "rgb(var(--color-accent-dark) / <alpha-value>)",
+        line: "rgb(var(--color-line) / <alpha-value>)",
       },
       boxShadow: {
-        soft: "0 18px 50px rgba(30, 36, 36, 0.08)",
-        card: "0 10px 30px rgba(26, 88, 102, 0.08)",
+        soft: "var(--shadow-soft)",
+        card: "var(--shadow-card)",
       },
       fontFamily: {
         sans: ["var(--font-heebo)", "Arial", "sans-serif"],
