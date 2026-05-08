@@ -3,8 +3,39 @@
 @tailwind utilities;
 
 :root {
+  --color-paper: 247 243 236;
+  --color-surface: 255 255 255;
+  --color-ink: 30 36 36;
+  --color-muted: 99 94 86;
+  --color-accent: 26 88 102;
+  --color-accent-dark: 16 58 68;
+  --color-line: 229 221 210;
+  --body-glow: rgba(26, 88, 102, 0.1);
+  --body-gradient-start: #f7f3ec;
+  --body-gradient-mid: #fbf8f2;
+  --body-gradient-end: #f7f3ec;
+  --shadow-soft: 0 18px 50px rgba(30, 36, 36, 0.08);
+  --shadow-card: 0 10px 30px rgba(26, 88, 102, 0.08);
   color-scheme: light;
   background: #f7f3ec;
+}
+
+:root.theme-dark {
+  --color-paper: 15 23 27;
+  --color-surface: 25 38 43;
+  --color-ink: 239 246 246;
+  --color-muted: 186 201 200;
+  --color-accent: 74 151 166;
+  --color-accent-dark: 142 220 225;
+  --color-line: 68 87 91;
+  --body-glow: rgba(74, 151, 166, 0.2);
+  --body-gradient-start: #0f171b;
+  --body-gradient-mid: #17252a;
+  --body-gradient-end: #0f171b;
+  --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.34);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.22);
+  color-scheme: dark;
+  background: #0f171b;
 }
 
 * {
@@ -15,18 +46,31 @@ html {
   scroll-behavior: smooth;
 }
 
+html.large-text {
+  font-size: 112.5%;
+}
+
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 16% 8%, rgba(26, 88, 102, 0.1), transparent 28rem),
-    linear-gradient(180deg, #f7f3ec 0%, #fbf8f2 48%, #f7f3ec 100%);
-  color: #1e2424;
+    radial-gradient(circle at 16% 8%, var(--body-glow), transparent 28rem),
+    linear-gradient(180deg, var(--body-gradient-start) 0%, var(--body-gradient-mid) 48%, var(--body-gradient-end) 100%);
+  color: rgb(var(--color-ink));
   font-family: var(--font-heebo), Arial, sans-serif;
 }
 
 button,
 input {
   font: inherit;
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 3px solid rgb(var(--color-accent));
+  outline-offset: 3px;
 }
 
 ::selection {
@@ -49,4 +93,33 @@ input {
     linear-gradient(#000 0 0);
   mask-composite: exclude;
   pointer-events: none;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 9999;
+  transform: translateY(-160%);
+  border-radius: 9999px;
+  background: rgb(var(--color-ink));
+  color: rgb(var(--color-paper));
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }

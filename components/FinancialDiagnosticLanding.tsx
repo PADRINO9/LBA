@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -20,6 +20,8 @@ import {
   RefreshCw,
   ShieldCheck,
   Sparkles,
+  Moon,
+  Sun,
   Target,
   WalletCards,
 } from "lucide-react";
@@ -47,6 +49,16 @@ type FormState = {
   preferredContactTime: string;
   consent: boolean;
   marketingConsent: boolean;
+};
+
+type ThemeProps = {
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
+};
+
+type TextSizeProps = {
+  isLargeText: boolean;
+  onToggleTextSize: () => void;
 };
 
 const questions: QuizQuestion[] = [
@@ -211,6 +223,11 @@ function getDominantCategories(answers: QuizAnswer[]) {
     .map(([category]) => category);
 }
 
+function getScrollBehavior(): ScrollBehavior {
+  if (typeof window === "undefined") return "smooth";
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+}
+
 function PrimaryButton({
   children,
   onClick,
@@ -229,7 +246,7 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-semibold text-white shadow-card transition duration-200 hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-semibold text-white shadow-card transition duration-200 hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-950 ${className}`}
     >
       {children}
     </button>
@@ -249,7 +266,7 @@ function SecondaryButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-line bg-white/70 px-6 py-3 text-base font-semibold text-ink transition duration-200 hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-4 focus:ring-accent/15 ${className}`}
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-line bg-surface/70 px-6 py-3 text-base font-semibold text-ink transition duration-200 hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-4 focus:ring-accent/20 ${className}`}
     >
       {children}
     </button>
@@ -258,23 +275,70 @@ function SecondaryButton({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/65 px-4 py-2 text-sm font-semibold text-accent">
+    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/65 px-4 py-2 text-sm font-semibold text-accent">
       <Sparkles className="h-4 w-4" />
       {children}
     </span>
   );
 }
 
-function Header({ onStart }: { onStart: () => void }) {
+function ThemeToggle({ isDarkMode, onToggleTheme }: ThemeProps) {
+  const label = isDarkMode ? "מעבר למצב בהיר" : "מעבר למצב כהה";
+  const Icon = isDarkMode ? Sun : Moon;
+
+  return (
+    <button
+      type="button"
+      onClick={onToggleTheme}
+      aria-label={label}
+      aria-pressed={isDarkMode}
+      title={label}
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-accent shadow-card transition duration-200 hover:border-accent/60 hover:bg-paper focus:outline-none focus:ring-4 focus:ring-accent/25"
+    >
+      <Icon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+}
+
+function TextSizeToggle({ isLargeText, onToggleTextSize }: TextSizeProps) {
+  const label = isLargeText ? "חזרה לגודל טקסט רגיל" : "הגדלת טקסט באתר";
+
+  return (
+    <button
+      type="button"
+      onClick={onToggleTextSize}
+      aria-label={label}
+      aria-pressed={isLargeText}
+      title={label}
+      className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-line bg-surface px-3 text-sm font-black tracking-normal text-accent shadow-card transition duration-200 hover:border-accent/60 hover:bg-paper focus:outline-none focus:ring-4 focus:ring-accent/25"
+    >
+      AA
+    </button>
+  );
+}
+
+function Header({
+  onStart,
+  isDarkMode,
+  onToggleTheme,
+  isLargeText,
+  onToggleTextSize,
+}: { onStart: () => void } & ThemeProps & TextSizeProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6">
-        <PrimaryButton onClick={onStart} className="min-h-10 px-4 py-2 text-sm">
-          התחילו מיפוי
-        </PrimaryButton>
-        <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-line bg-white shadow-card sm:h-28 sm:w-44">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:flex-nowrap sm:px-6">
+        <div className="order-2 flex w-full items-center justify-between gap-2 sm:order-1 sm:w-auto sm:justify-start">
+          <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
+            התחילו מיפוי
+          </PrimaryButton>
+          <div className="flex shrink-0 items-center gap-2">
+          <TextSizeToggle isLargeText={isLargeText} onToggleTextSize={onToggleTextSize} />
+          <ThemeToggle isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
+          </div>
+        </div>
+        <div className="relative order-1 h-20 w-36 shrink-0 overflow-hidden rounded-xl border border-line bg-white shadow-card sm:order-2 sm:h-28 sm:w-44">
           <Image
-            src="/logo4-header.png"
+            src="/lba-logo-header.png"
             alt="ליאור בן ארי | פרקטיקה פיננסית"
             fill
             className="object-contain p-1"
@@ -291,7 +355,7 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
   return (
     <section className="mx-auto grid max-w-6xl gap-8 px-4 pb-10 pt-7 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-16 lg:pt-12">
       <div className="relative z-10">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-sm font-semibold text-accent-dark shadow-card">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 text-sm font-semibold text-accent-dark shadow-card">
           <ShieldCheck className="h-4 w-4" />
           מיפוי חוסן פיננסי
         </div>
@@ -312,24 +376,24 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
           ללא התחייבות. ללא הבטחות. רק מיפוי ראשוני שמטרתו לעשות סדר.
         </p>
         <div className="mt-7 grid gap-3 text-sm sm:grid-cols-3">
-          <div className="rounded-xl border border-line bg-white/70 p-4 shadow-card">
+          <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-card">
             <div className="font-bold text-ink">120 שניות</div>
             <div className="mt-1 text-muted">מיפוי קצר וממוקד</div>
           </div>
-          <div className="rounded-xl border border-line bg-white/70 p-4 shadow-card">
+          <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-card">
             <div className="font-bold text-ink">16 שנות ניסיון</div>
             <div className="mt-1 text-muted">בכסף גדול ומבנים מורכבים</div>
           </div>
-          <div className="rounded-xl border border-line bg-white/70 p-4 shadow-card">
+          <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-card">
             <div className="font-bold text-ink">ללא הבטחות תשואה</div>
             <div className="mt-1 text-muted">אבחון ראשוני ואחראי</div>
           </div>
         </div>
       </div>
 
-      <div className="glass-border overflow-hidden rounded-[1.75rem] bg-white shadow-soft">
+      <div className="glass-border overflow-hidden rounded-[1.75rem] bg-surface shadow-soft">
         <div className="relative p-3 sm:p-4">
-          <div className="relative h-[390px] overflow-hidden rounded-[1.35rem] bg-accent-dark sm:h-[500px]">
+          <div className="relative h-[390px] overflow-hidden rounded-[1.35rem] bg-accent-dark dark:bg-[#0b3038] sm:h-[500px]">
             <Image
               src="/lior-pic/lior1.png"
               alt="ליאור בן ארי, פרקטיקה פיננסית"
@@ -347,9 +411,9 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
 
 function WealthPlanningSection() {
   return (
-    <section id="full-picture" className="border-y border-line/80 bg-white/50">
+    <section id="full-picture" className="border-y border-line/80 bg-surface/50">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-        <div className="mb-10 grid gap-6 rounded-[1.5rem] border border-line bg-white p-6 shadow-soft lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
+        <div className="mb-10 grid gap-6 rounded-[1.5rem] border border-line bg-surface p-6 shadow-soft lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
           <div>
             <SectionLabel>למה לבדוק דווקא עכשיו?</SectionLabel>
             <h2 className="mt-5 text-3xl font-bold leading-tight text-ink sm:text-4xl">
@@ -370,7 +434,7 @@ function WealthPlanningSection() {
         </div>
         <div className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {["16 שנות ניסיון", "רישיון פנסיוני מוסמך", "מיפוי קצר של 120 שניות", "שיחת התאמה ללא התחייבות"].map((item) => (
-            <div key={item} className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-4 shadow-card">
+            <div key={item} className="flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-4 shadow-card">
               <ShieldCheck className="h-5 w-5 shrink-0 text-accent" />
               <span className="text-sm font-bold text-ink">{item}</span>
             </div>
@@ -398,7 +462,7 @@ function WealthPlanningSection() {
               })}
             </div>
           </div>
-          <div className="glass-border overflow-hidden rounded-[2rem] bg-white shadow-soft">
+          <div className="glass-border overflow-hidden rounded-[2rem] bg-surface shadow-soft">
             <div className="relative h-72 sm:h-96">
               <Image
                 src="/lior-pic/lior3.png"
@@ -408,7 +472,7 @@ function WealthPlanningSection() {
                 sizes="(min-width: 1024px) 520px, 100vw"
               />
             </div>
-            <div className="border-t border-line bg-white p-5">
+            <div className="border-t border-line bg-surface p-5">
               <div className="flex items-center gap-3 text-accent-dark">
                 <Compass className="h-5 w-5" />
                 <h3 className="text-xl font-bold">חוסן משפחתי לטווח ארוך</h3>
@@ -443,7 +507,7 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {planningSteps.map((step, index) => (
-            <article key={step.title} className="rounded-xl border border-line bg-white p-5 shadow-card">
+            <article key={step.title} className="rounded-xl border border-line bg-surface p-5 shadow-card">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-xl font-bold text-ink">{step.title}</h3>
                 <span className="text-3xl font-bold text-accent/22">0{index + 1}</span>
@@ -459,7 +523,7 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
 
 function QuestionsSection() {
   return (
-    <section id="questions" className="border-y border-line/80 bg-accent-dark text-white">
+    <section id="questions" className="border-y border-line/80 bg-accent-dark text-white dark:bg-[#0b3038]">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-16">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
@@ -501,8 +565,8 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
             <ArrowLeft className="h-5 w-5" />
           </PrimaryButton>
         </div>
-        <div className="glass-border overflow-hidden rounded-[1.5rem] bg-white p-3 shadow-soft">
-          <div className="relative h-[300px] overflow-hidden rounded-[1.15rem] bg-accent-dark sm:h-[420px]">
+        <div className="glass-border overflow-hidden rounded-[1.5rem] bg-surface p-3 shadow-soft">
+          <div className="relative h-[300px] overflow-hidden rounded-[1.15rem] bg-accent-dark dark:bg-[#0b3038] sm:h-[420px]">
             <video
               src="/lior-pic/mp_.mp4"
               poster="/lior-pic/lior2.png"
@@ -513,6 +577,9 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
               aria-label="סרטון היכרות עם ליאור בן ארי"
             />
           </div>
+          <p className="mt-3 text-sm leading-6 text-muted">
+            תקציר נגיש לסרטון: ליאור מסביר שמיפוי החוסן הפיננסי נועד להציף נקודות תורפה שקטות, להבין האם יש מקום לבדיקה מקצועית, ולא לתת המלצה פיננסית אוטומטית.
+          </p>
         </div>
       </div>
     </section>
@@ -529,6 +596,8 @@ function DiagnosticQuiz({
   const current = questions[index];
   const selectedForQuestion = selected[current.id] ?? [];
   const progress = ((index + 1) / questions.length) * 100;
+  const questionTitleId = useId();
+  const questionInstructionId = useId();
 
   const chooseOption = (optionId: string) => {
     setSelected((previous) => {
@@ -574,7 +643,7 @@ function DiagnosticQuiz({
 
   return (
     <section id="quiz" className="mx-auto max-w-4xl px-4 py-14 sm:px-6 lg:py-20">
-      <div className="glass-border overflow-hidden rounded-[2rem] bg-white p-5 shadow-soft sm:p-8">
+      <div className="glass-border overflow-hidden rounded-[2rem] bg-surface p-5 shadow-soft sm:p-8">
         <div className="mb-7">
           <p className="text-sm font-bold text-accent">מיפוי חוסן פיננסי</p>
           <h2 className="mt-2 text-3xl font-bold leading-tight text-ink sm:text-4xl">6 שאלות קצרות שיעזרו להציף אזורים שכדאי לבדוק במבנה הפיננסי שלכם.</h2>
@@ -582,15 +651,22 @@ function DiagnosticQuiz({
         <div className="mb-8">
           <div className="flex items-center justify-between gap-4 text-sm font-semibold text-muted">
             <span>שאלה {index + 1} מתוך {questions.length}</span>
-            {current.multi ? <span>ניתן לבחור יותר מאפשרות אחת</span> : <span>בחרו תשובה אחת</span>}
+            <span id={questionInstructionId}>{current.multi ? "ניתן לבחור יותר מאפשרות אחת" : "בחרו תשובה אחת"}</span>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-paper">
+          <div
+            className="mt-3 h-2 overflow-hidden rounded-full bg-paper"
+            role="progressbar"
+            aria-label="התקדמות בשאלון"
+            aria-valuemin={1}
+            aria-valuemax={questions.length}
+            aria-valuenow={index + 1}
+          >
             <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
-        <div key={current.id} className="animate-[fadeIn_220ms_ease-out]">
-          <h2 className="text-2xl font-bold leading-tight text-ink sm:text-4xl">{current.question}</h2>
+        <div key={current.id} className="animate-[fadeIn_220ms_ease-out]" role="group" aria-labelledby={questionTitleId} aria-describedby={questionInstructionId}>
+          <h2 id={questionTitleId} className="text-2xl font-bold leading-tight text-ink sm:text-4xl">{current.question}</h2>
           <div className="mt-7 grid gap-3">
             {current.options.map((option) => {
               const isActive = selectedForQuestion.includes(option.id);
@@ -599,16 +675,17 @@ function DiagnosticQuiz({
                   type="button"
                   key={option.id}
                   onClick={() => chooseOption(option.id)}
+                  aria-pressed={isActive}
                   className={`flex min-h-20 items-center justify-between gap-4 rounded-3xl border p-4 text-right transition duration-200 sm:p-5 ${
                     isActive
                       ? "border-accent bg-accent/8 shadow-card"
-                      : "border-line bg-paper/40 hover:border-accent/45 hover:bg-white"
+                      : "border-line bg-paper/40 hover:border-accent/45 hover:bg-surface"
                   }`}
                 >
                   <span className="text-base font-semibold leading-7 text-ink sm:text-lg">{option.label}</span>
                   <span
                     className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition ${
-                      isActive ? "border-accent bg-accent text-white" : "border-line bg-white text-transparent"
+                      isActive ? "border-accent bg-accent text-white dark:text-slate-950" : "border-line bg-white text-transparent"
                     }`}
                   >
                     <Check className="h-4 w-4" />
@@ -620,10 +697,14 @@ function DiagnosticQuiz({
         </div>
 
         <div className="mt-8 flex items-center justify-between gap-3">
-          <SecondaryButton onClick={() => setIndex((value) => Math.max(0, value - 1))} className={index === 0 ? "invisible" : ""}>
-            <ArrowRight className="h-5 w-5" />
-            חזרה
-          </SecondaryButton>
+          {index > 0 ? (
+            <SecondaryButton onClick={() => setIndex((value) => Math.max(0, value - 1))}>
+              <ArrowRight className="h-5 w-5" />
+              חזרה
+            </SecondaryButton>
+          ) : (
+            <span className="min-h-12" aria-hidden="true" />
+          )}
           <PrimaryButton onClick={goNext} disabled={!selectedForQuestion.length}>
             {index === questions.length - 1 ? "הצגת תוצאה" : "המשך"}
             <ArrowLeft className="h-5 w-5" />
@@ -656,7 +737,13 @@ function ResultAndLeadForm({
     marketingConsent: false,
   });
   const [submitted, setSubmitted] = useState(false);
-  const canSubmit = form.fullName.trim() && form.phone.trim() && form.consent;
+  const canSubmit = Boolean(form.fullName.trim() && form.phone.trim() && form.consent);
+  const formErrorId = useId();
+  const consentErrorId = useId();
+  const hasFormError = submitted && !canSubmit;
+  const fullNameRef = useRef<HTMLInputElement | null>(null);
+  const phoneRef = useRef<HTMLInputElement | null>(null);
+  const consentRef = useRef<HTMLInputElement | null>(null);
 
   const updateForm = (key: keyof FormState, value: string | boolean) => {
     setForm((previous) => ({ ...previous, [key]: value }));
@@ -665,7 +752,22 @@ function ResultAndLeadForm({
   const submitLead = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      requestAnimationFrame(() => {
+        if (!form.fullName.trim()) {
+          fullNameRef.current?.focus();
+          return;
+        }
+        if (!form.phone.trim()) {
+          phoneRef.current?.focus();
+          return;
+        }
+        if (!form.consent) {
+          consentRef.current?.focus();
+        }
+      });
+      return;
+    }
 
     const lead: Lead = {
       id: crypto.randomUUID(),
@@ -692,7 +794,7 @@ function ResultAndLeadForm({
   return (
     <section id="result" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="glass-border rounded-[2rem] bg-accent-dark p-6 text-white shadow-soft sm:p-8">
+        <div className="glass-border rounded-[2rem] bg-accent-dark p-6 text-white shadow-soft dark:bg-[#0b3038] sm:p-8">
           <p className="text-sm font-semibold text-white/70">התוצאה הראשונית שלכם</p>
           <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">{recommendedSolution}</h2>
           <p className="mt-5 text-lg leading-8 text-white/82">
@@ -702,7 +804,7 @@ function ResultAndLeadForm({
             <div className="text-sm text-white/68">נושאים שעלו באבחון</div>
             <div className="mt-3 flex flex-wrap gap-2">
               {(dominantCategories.length ? dominantCategories : ["planning" as Category]).map((category) => (
-                <span key={category} className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-accent-dark">
+                <span key={category} className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-accent-dark dark:text-[#0b3038]">
                   {categoryLabels[category]}
                 </span>
               ))}
@@ -717,11 +819,21 @@ function ResultAndLeadForm({
           </p>
         </div>
 
-        <form onSubmit={submitLead} className="glass-border rounded-[2rem] bg-white p-6 shadow-soft sm:p-8">
+        <form
+          onSubmit={submitLead}
+          noValidate
+          aria-describedby={hasFormError ? formErrorId : undefined}
+          className="glass-border rounded-[2rem] bg-surface p-6 shadow-soft sm:p-8"
+        >
           <h2 className="text-3xl font-bold leading-tight text-ink">רוצים לבדוק את זה בצורה מקצועית?</h2>
           <p className="mt-4 text-lg leading-8 text-muted">
             השאירו פרטים ונחזור אליכם לשיחת התאמה קצרה. מטרת השיחה היא להבין את התמונה הראשונית, לבדוק האם יש מקום להמשך בדיקה מקצועית, ולהסביר מה ניתן לעשות בצורה מסודרת ואחראית.
           </p>
+          {hasFormError ? (
+            <div id={formErrorId} role="alert" className="mt-5 rounded-2xl border border-accent-dark bg-paper/70 p-4 text-sm font-semibold leading-6 text-ink">
+              נא למלא את שדות החובה ולאשר יצירת קשר כדי שנוכל לחזור אליכם.
+            </div>
+          ) : null}
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
             <Field
               label="שם מלא"
@@ -729,6 +841,8 @@ function ResultAndLeadForm({
               value={form.fullName}
               onChange={(value) => updateForm("fullName", value)}
               error={submitted && !form.fullName.trim() ? "נא למלא שם מלא" : undefined}
+              autoComplete="name"
+              inputRef={fullNameRef}
             />
             <Field
               label="טלפון"
@@ -737,12 +851,16 @@ function ResultAndLeadForm({
               value={form.phone}
               onChange={(value) => updateForm("phone", value)}
               error={submitted && !form.phone.trim() ? "נא למלא מספר טלפון" : undefined}
+              autoComplete="tel"
+              inputMode="tel"
+              inputRef={phoneRef}
             />
-            <Field label="אימייל" type="email" value={form.email} onChange={(value) => updateForm("email", value)} />
+            <Field label="אימייל" type="email" value={form.email} onChange={(value) => updateForm("email", value)} autoComplete="email" inputMode="email" />
             <Field
               label="זמן נוח ליצירת קשר"
               value={form.preferredContactTime}
               onChange={(value) => updateForm("preferredContactTime", value)}
+              autoComplete="off"
             />
           </div>
           <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-paper/50 p-4">
@@ -750,14 +868,22 @@ function ResultAndLeadForm({
               type="checkbox"
               checked={form.consent}
               onChange={(event) => updateForm("consent", event.target.checked)}
+              required
+              aria-invalid={submitted && !form.consent ? true : undefined}
+              aria-describedby={submitted && !form.consent ? consentErrorId : undefined}
+              ref={consentRef}
               className="mt-1 h-5 w-5 accent-accent"
             />
             <span className="text-sm font-medium leading-6 text-ink">
               אני מאשר/ת יצירת קשר מצד פרקטיקה פיננסית — ליאור בן ארי.
-              {submitted && !form.consent ? <span className="block text-accent-dark">נדרש אישור ליצירת קשר.</span> : null}
+              {submitted && !form.consent ? (
+                <span id={consentErrorId} role="alert" className="block text-accent-dark">
+                  נדרש אישור ליצירת קשר.
+                </span>
+              ) : null}
             </span>
           </label>
-          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-white p-4">
+          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-surface p-4">
             <input
               type="checkbox"
               checked={form.marketingConsent}
@@ -802,6 +928,9 @@ function Field({
   type = "text",
   required,
   error,
+  autoComplete,
+  inputMode,
+  inputRef,
 }: {
   label: string;
   value: string;
@@ -809,37 +938,75 @@ function Field({
   type?: string;
   required?: boolean;
   error?: string;
+  autoComplete?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  inputRef?: React.Ref<HTMLInputElement>;
 }) {
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
+
   return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-ink">
+    <div className="block">
+      <label htmlFor={inputId} className="mb-2 block text-sm font-semibold text-ink">
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
-      </span>
+        {required ? (
+          <span className="text-accent" aria-hidden="true">
+            {" "}
+            *
+          </span>
+        ) : null}
+      </label>
       <input
+        id={inputId}
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`h-12 w-full rounded-xl border bg-paper/35 px-4 py-3 text-base text-ink outline-none transition placeholder:text-muted/60 focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/10 ${
+        ref={inputRef}
+        required={required}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        className={`h-12 w-full rounded-xl border bg-paper/35 px-4 py-3 text-base text-ink outline-none transition placeholder:text-muted/60 focus:border-accent focus:bg-surface focus:ring-4 focus:ring-accent/15 ${
           error ? "border-accent-dark" : "border-line"
         }`}
       />
-      {error ? <span className="mt-1 block text-sm font-medium text-accent-dark">{error}</span> : null}
-    </label>
+      {error ? (
+        <span id={errorId} role="alert" className="mt-1 block text-sm font-medium text-accent-dark">
+          {error}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
-function ThankYouPage({ onRestart }: { onRestart: () => void }) {
+function ThankYouPage({
+  onRestart,
+  isDarkMode,
+  onToggleTheme,
+  isLargeText,
+  onToggleTextSize,
+}: { onRestart: () => void } & ThemeProps & TextSizeProps) {
   useEffect(() => {
     trackEvent("ViewThankYou");
   }, []);
 
   return (
-    <main className="min-h-screen bg-paper text-ink">
-      <Header onStart={onRestart} />
+    <>
+      <a href="#main-content" className="skip-link">
+        דילוג לתוכן המרכזי
+      </a>
+      <main id="main-content" tabIndex={-1} className="min-h-screen bg-paper text-ink">
+        <Header
+          onStart={onRestart}
+          isDarkMode={isDarkMode}
+          onToggleTheme={onToggleTheme}
+          isLargeText={isLargeText}
+          onToggleTextSize={onToggleTextSize}
+        />
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-20">
         <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <div className="glass-border rounded-[2rem] bg-accent-dark p-7 text-white shadow-soft sm:p-10">
+          <div className="glass-border rounded-[2rem] bg-accent-dark p-7 text-white shadow-soft dark:bg-[#0b3038] sm:p-10">
             <SectionLabel>תודה</SectionLabel>
             <h1 className="mt-6 text-4xl font-bold leading-tight sm:text-5xl">הפרטים התקבלו. תודה.</h1>
             <p className="mt-5 text-xl leading-8 text-white/82">
@@ -861,13 +1028,13 @@ function ThankYouPage({ onRestart }: { onRestart: () => void }) {
             />
           </div>
         </div>
-        <div className="mt-7 grid gap-4 rounded-[2rem] border border-line bg-white p-5 shadow-card sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid gap-4 rounded-[2rem] border border-line bg-surface p-5 shadow-card sm:grid-cols-2 lg:grid-cols-4">
           <ContactItem icon={<MapPin className="h-5 w-5" />} label="כתובת" value="יצחק מודעי 2, רחובות" />
-          <ContactItem icon={<Phone className="h-5 w-5" />} label="טלפון" value="03-686-1371" />
-          <ContactItem icon={<Mail className="h-5 w-5" />} label="אימייל" value="office@pra-fin.co.il" />
+          <ContactItem icon={<Phone className="h-5 w-5" />} label="טלפון" value="03-686-1371" href="tel:036861371" />
+          <ContactItem icon={<Mail className="h-5 w-5" />} label="אימייל" value="office@pra-fin.co.il" href="mailto:office@pra-fin.co.il" />
           <a
             href="https://wa.me/97236861371"
-            className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4 font-semibold text-accent transition hover:border-accent/50 hover:bg-white"
+            className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4 font-semibold text-accent transition hover:border-accent/50 hover:bg-surface focus:outline-none focus:ring-4 focus:ring-accent/20"
           >
             <MessageCircle className="h-5 w-5" />
             שליחת הודעה בוואטסאפ
@@ -875,27 +1042,42 @@ function ThankYouPage({ onRestart }: { onRestart: () => void }) {
         </div>
       </section>
       <Footer />
-    </main>
+      </main>
+    </>
   );
 }
 
 function InfoBlock({ title, text }: { title: string; text: string }) {
   return (
-    <article className="rounded-[1.5rem] border border-line bg-white p-5 shadow-card">
+    <article className="rounded-[1.5rem] border border-line bg-surface p-5 shadow-card">
       <h2 className="text-xl font-bold text-ink">{title}</h2>
       <p className="mt-3 text-base leading-7 text-muted">{text}</p>
     </article>
   );
 }
 
-function ContactItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4">
-      <span className="text-accent">{icon}</span>
+function ContactItem({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
+  const content = (
+    <>
+      <span className="text-accent" aria-hidden="true">{icon}</span>
       <span>
         <span className="block text-xs font-semibold text-muted">{label}</span>
         <span className="block text-sm font-bold text-ink">{value}</span>
       </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4 transition hover:border-accent/50 hover:bg-surface focus:outline-none focus:ring-4 focus:ring-accent/20">
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4">
+      {content}
     </div>
   );
 }
@@ -911,15 +1093,15 @@ function FAQSection() {
             המטרה היא להבין האם יש נקודות שכדאי לבדוק, בלי להבטיח תוצאה ובלי לדחוף להחלטה במקום.
           </p>
           <div className="mt-6 grid gap-3 text-sm font-semibold text-ink">
-            <div className="flex items-center gap-3 rounded-xl border border-line bg-white p-4">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
               <LockKeyhole className="h-5 w-5 text-accent" />
               הפרטים משמשים ליצירת קשר ולשיחת התאמה
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-line bg-white p-4">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
               <ClipboardCheck className="h-5 w-5 text-accent" />
               אין צורך לקבל החלטה בשיחה הראשונה
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-line bg-white p-4">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
               <RefreshCw className="h-5 w-5 text-accent" />
               אין המלצה פיננסית אוטומטית
             </div>
@@ -927,7 +1109,7 @@ function FAQSection() {
         </div>
         <div className="grid gap-4">
           {faqs.map((item) => (
-            <article key={item.question} className="rounded-2xl border border-line bg-white p-5 shadow-card">
+            <article key={item.question} className="rounded-2xl border border-line bg-surface p-5 shadow-card">
               <h3 className="text-lg font-bold leading-7 text-ink">{item.question}</h3>
               <p className="mt-2 text-base leading-7 text-muted">{item.answer}</p>
             </article>
@@ -940,7 +1122,7 @@ function FAQSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-line bg-white/45">
+    <footer className="border-t border-line bg-surface/45">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="grid gap-4 text-sm leading-7 text-muted lg:grid-cols-[0.9fr_1.1fr]">
           <div>
@@ -951,7 +1133,7 @@ function Footer() {
             <p className="mt-2 font-semibold text-ink">
               פועל ברישיון פנסיוני מוסמך מטעם משרד האוצר | מספר רישיון: L-00137167
             </p>
-            <div className="mt-3 flex flex-wrap gap-3 font-semibold text-accent">
+            <div className="mt-3 flex flex-wrap gap-3 font-semibold text-accent" aria-label="קישורי מידע משפטי ונגישות">
               <a href="#privacy" className="focus:outline-none focus:ring-4 focus:ring-accent/15">מדיניות פרטיות</a>
               <a href="#accessibility" className="focus:outline-none focus:ring-4 focus:ring-accent/15">הצהרת נגישות</a>
             </div>
@@ -963,14 +1145,27 @@ function Footer() {
           </p>
         </div>
         <div className="mt-6 grid gap-4 text-sm leading-7 text-muted sm:grid-cols-2">
-          <p id="privacy">
-            <span className="font-bold text-ink">מדיניות פרטיות: </span>
-            הפרטים שתשאירו ישמשו ליצירת קשר ולבדיקת התאמה ראשונית בלבד. לא מתבצעת בשלב זה שליחה למערכות CRM, דיוור, Google Sheets, Supabase או Make.
-          </p>
-          <p id="accessibility">
-            <span className="font-bold text-ink">הצהרת נגישות: </span>
-            הדף נבנה עם תוויות לשדות, ניווט מקלדת, מצבי פוקוס ברורים וטקסטים שאינם מוטמעים כתמונה בלבד.
-          </p>
+          <section id="privacy" aria-labelledby="privacy-title">
+            <h2 id="privacy-title" className="font-bold text-ink">מדיניות פרטיות</h2>
+            <p>
+              הפרטים שתשאירו ישמשו ליצירת קשר ולבדיקת התאמה ראשונית בלבד. לא מתבצעת בשלב זה שליחה למערכות CRM, דיוור, Google Sheets, Supabase או Make.
+            </p>
+          </section>
+          <section id="accessibility" aria-labelledby="accessibility-title">
+            <h2 id="accessibility-title" className="font-bold text-ink">הצהרת נגישות</h2>
+            <p>
+              הדף נבנה בהתאם לעקרונות תקנה 35 לתקנות שוויון זכויות לאנשים עם מוגבלות, ת״י 5568 והנחיות WCAG 2.0 ברמת AA. בוצעו התאמות הכוללות מבנה סמנטי, כותרות תקינות, תוויות לשדות, הודעות שגיאה נגישות, ניווט מקלדת, דילוג לתוכן המרכזי, מצבי פוקוס ברורים, ניגודיות צבעים, תמונות עם טקסט חלופי ומצב תצוגה כהה/בהיר.
+            </p>
+            <p className="mt-2">
+              בנוסף קיימים כפתורי עזר להגדלת טקסט ולבחירת מצב בהיר/כהה. נכון לעדכון זה אין באתר קבצי PDF או מסמכים להורדה. הסרטון באתר כולל תקציר טקסטואלי, וכתוביות או תמלול מלא יטופלו בנפרד.
+            </p>
+            <p className="mt-2">
+              אם נתקלתם בקושי נגישות, ניתן לפנות אלינו בטלפון <a href="tel:036861371" className="font-semibold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">03-686-1371</a> או במייל <a href="mailto:office@pra-fin.co.il" className="font-semibold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">office@pra-fin.co.il</a>. הפנייה תיבדק ונפעל לתקן או לספק חלופה נגישה ככל האפשר.
+            </p>
+            <p className="mt-2">
+              ההצהרה עודכנה לאחרונה בתאריך 8 במאי 2026.
+            </p>
+          </section>
         </div>
       </div>
     </footer>
@@ -979,6 +1174,9 @@ function Footer() {
 
 export default function FinancialDiagnosticLanding() {
   const [quizStarted, setQuizStarted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLargeText, setIsLargeText] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
   const [result, setResult] = useState<{
     answers: QuizAnswer[];
     totalScore: number;
@@ -990,18 +1188,43 @@ export default function FinancialDiagnosticLanding() {
   const detailsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const savedTheme = window.localStorage.getItem("lior-theme");
+    const savedTextSize = window.localStorage.getItem("lior-large-text");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setIsDarkMode(savedTheme ? savedTheme === "dark" : prefersDark);
+    setIsLargeText(savedTextSize === "true");
+    setThemeReady(true);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("theme-dark", isDarkMode);
+    document.documentElement.classList.toggle("dark", isDarkMode);
+    document.documentElement.style.colorScheme = isDarkMode ? "dark" : "light";
+    if (themeReady) {
+      window.localStorage.setItem("lior-theme", isDarkMode ? "dark" : "light");
+    }
+  }, [isDarkMode, themeReady]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("large-text", isLargeText);
+    if (themeReady) {
+      window.localStorage.setItem("lior-large-text", String(isLargeText));
+    }
+  }, [isLargeText, themeReady]);
+
+  useEffect(() => {
     trackEvent("PageView", { source: "facebook", campaign: "financial-stress-test-landing" });
   }, []);
 
   useEffect(() => {
     if (quizStarted && quizRef.current) {
-      quizRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      quizRef.current.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
     }
   }, [quizStarted]);
 
   useEffect(() => {
     if (result) {
-      document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("result")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
     }
   }, [result]);
 
@@ -1013,25 +1236,46 @@ export default function FinancialDiagnosticLanding() {
   };
 
   const scrollToVideo = () => {
-    detailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    detailsRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
   };
 
   const reset = () => {
     setThankYou(false);
     setResult(null);
     setQuizStarted(true);
-    setTimeout(() => document.getElementById("quiz")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    setTimeout(() => document.getElementById("quiz")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" }), 50);
   };
+
+  const toggleTheme = () => setIsDarkMode((value) => !value);
+  const toggleTextSize = () => setIsLargeText((value) => !value);
 
   const resultPayload = useMemo(() => result, [result]);
 
   if (thankYou) {
-    return <ThankYouPage onRestart={reset} />;
+    return (
+      <ThankYouPage
+        onRestart={reset}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+        isLargeText={isLargeText}
+        onToggleTextSize={toggleTextSize}
+      />
+    );
   }
 
   return (
-    <main className="min-h-screen text-ink">
-      <Header onStart={startQuiz} />
+    <>
+      <a href="#main-content" className="skip-link">
+        דילוג לתוכן המרכזי
+      </a>
+      <main id="main-content" tabIndex={-1} className="min-h-screen text-ink">
+      <Header
+        onStart={startQuiz}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+        isLargeText={isLargeText}
+        onToggleTextSize={toggleTextSize}
+      />
       <Hero onStart={startQuiz} onHowItWorks={scrollToVideo} />
       <div ref={detailsRef}>
         <WealthPlanningSection />
@@ -1071,6 +1315,7 @@ export default function FinancialDiagnosticLanding() {
           }
         }
       `}</style>
-    </main>
+      </main>
+    </>
   );
 }
