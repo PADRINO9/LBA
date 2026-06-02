@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { StressTestFunnel } from "@/src/components/funnel/StressTestFunnel";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Financial Stress Test | פרקטיקה פיננסית — ליאור בן ארי",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function StressTestPage() {
-  return <StressTestFunnel />;
+  redirect("/");
 }
