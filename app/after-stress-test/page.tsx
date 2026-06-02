@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AfterStressTestPage } from "@/src/components/funnel/AfterStressTestPage";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "תודה | פרקטיקה פיננסית — ליאור בן ארי",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AfterStressTestRoute() {
-  return <AfterStressTestPage />;
+  redirect("/");
 }

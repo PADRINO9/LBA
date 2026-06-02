@@ -47,7 +47,7 @@ export function FunnelShell({ children, ctaHref, ctaLabel }: FunnelShellProps) {
       <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/92 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link
-            href="/stress-test"
+            href="/landing"
             className="flex min-w-0 items-center gap-3 rounded-full focus:outline-none focus:ring-4 focus:ring-accent/20"
             aria-label="פרקטיקה פיננסית — ליאור בן ארי"
           >

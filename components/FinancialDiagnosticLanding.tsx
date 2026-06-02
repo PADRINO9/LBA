@@ -179,6 +179,11 @@ const faqs = [
   },
 ];
 
+const LEAD_FUNNEL_ENABLED = false;
+const HEADER_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "התחילו מיפוי" : "לתיאום שיחה";
+const HERO_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "התחילו מיפוי של 120 שניות" : "לתיאום שיחה עם ליאור";
+const VIDEO_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "המשך לאבחון" : "לתיאום שיחה";
+
 const categoryLabels: Record<Category, string> = {
   clarity: "סדר ובהירות",
   complexity: "מורכבות פיננסית",
@@ -329,7 +334,7 @@ function Header({
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:flex-nowrap sm:px-6">
         <div className="order-2 flex w-full items-center justify-between gap-2 sm:order-1 sm:w-auto sm:justify-start">
           <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
-            התחילו מיפוי
+            {HEADER_CTA_LABEL}
           </PrimaryButton>
           <div className="flex shrink-0 items-center gap-2">
           <TextSizeToggle isLargeText={isLargeText} onToggleTextSize={onToggleTextSize} />
@@ -367,7 +372,7 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <PrimaryButton onClick={onStart}>
-            התחילו מיפוי של 120 שניות
+            {HERO_CTA_LABEL}
             <ArrowLeft className="h-5 w-5" />
           </PrimaryButton>
           <SecondaryButton onClick={onHowItWorks}>מה בודקים במיפוי?</SecondaryButton>
@@ -561,7 +566,7 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
             בסרטון קצר ליאור מסביר למה בעלי הכנסה גבוהה עלולים לפספס סיכונים שקטים, ומה מטרת המיפוי הראשוני.
           </p>
           <PrimaryButton onClick={onContinue} className="mt-7">
-            המשך לאבחון
+            {VIDEO_CTA_LABEL}
             <ArrowLeft className="h-5 w-5" />
           </PrimaryButton>
         </div>
@@ -1122,7 +1127,7 @@ function FAQSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-line bg-surface/45">
+    <footer id="contact" className="border-t border-line bg-surface/45">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="grid gap-4 text-sm leading-7 text-muted lg:grid-cols-[0.9fr_1.1fr]">
           <div>
@@ -1229,6 +1234,11 @@ export default function FinancialDiagnosticLanding() {
   }, [result]);
 
   const startQuiz = () => {
+    if (!LEAD_FUNNEL_ENABLED) {
+      trackEvent("ContactIntent", { source: "landing_cta" });
+      document.getElementById("contact")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      return;
+    }
     if (!quizStarted) {
       trackEvent("StartStressTest");
     }
@@ -1242,6 +1252,10 @@ export default function FinancialDiagnosticLanding() {
   const reset = () => {
     setThankYou(false);
     setResult(null);
+    if (!LEAD_FUNNEL_ENABLED) {
+      document.getElementById("contact")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      return;
+    }
     setQuizStarted(true);
     setTimeout(() => document.getElementById("quiz")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" }), 50);
   };
@@ -1283,23 +1297,27 @@ export default function FinancialDiagnosticLanding() {
       <ProcessSection onStart={startQuiz} />
       <QuestionsSection />
       <VideoSection onContinue={startQuiz} />
-      <div ref={quizRef}>
-        {quizStarted && !resultPayload ? (
-          <DiagnosticQuiz
-            onComplete={(answers, totalScore, dominantCategories, recommendedSolution) =>
-              setResult({ answers, totalScore, dominantCategories, recommendedSolution })
-            }
-          />
-        ) : null}
-      </div>
-      {resultPayload ? (
-        <ResultAndLeadForm
-          answers={resultPayload.answers}
-          totalScore={resultPayload.totalScore}
-          dominantCategories={resultPayload.dominantCategories}
-          recommendedSolution={resultPayload.recommendedSolution}
-          onLead={() => setThankYou(true)}
-        />
+      {LEAD_FUNNEL_ENABLED ? (
+        <>
+          <div ref={quizRef}>
+            {quizStarted && !resultPayload ? (
+              <DiagnosticQuiz
+                onComplete={(answers, totalScore, dominantCategories, recommendedSolution) =>
+                  setResult({ answers, totalScore, dominantCategories, recommendedSolution })
+                }
+              />
+            ) : null}
+          </div>
+          {resultPayload ? (
+            <ResultAndLeadForm
+              answers={resultPayload.answers}
+              totalScore={resultPayload.totalScore}
+              dominantCategories={resultPayload.dominantCategories}
+              recommendedSolution={resultPayload.recommendedSolution}
+              onLead={() => setThankYou(true)}
+            />
+          ) : null}
+        </>
       ) : null}
       <FAQSection />
       <Footer />
