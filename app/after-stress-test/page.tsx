@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import FinancialDiagnosticLanding from "@/components/FinancialDiagnosticLanding";
 
 export const metadata: Metadata = {
-  title: "תודה | פרקטיקה פיננסית — ליאור בן ארי",
+  title: "פרקטיקה פיננסית — ליאור בן ארי",
   description:
-    "עמוד תודה לאחר מיפוי החוסן הפיננסי, עם הסבר על השיחה, פרטי קשר ורישיון.",
+    "דף הנחיתה של פרקטיקה פיננסית — ליאור בן ארי, עם מידע על תכנון פיננסי ויצירת קשר.",
 };
 
 export default function AfterStressTestRoute() {
-  redirect("/");
+  return <FinancialDiagnosticLanding />;
 }
