@@ -106,7 +106,7 @@ export function AfterStressTestPage() {
   }, []);
 
   return (
-    <FunnelShell ctaHref="/stress-test" ctaLabel="מיפוי חדש">
+    <FunnelShell ctaHref="/" ctaLabel="חזרה לדף הנחיתה">
       <section className="px-4 py-10 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -145,7 +145,7 @@ export function AfterStressTestPage() {
                   role="img"
                   aria-label="מיקום לסרטון היכרות עם ליאור בן ארי"
                 >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-white shadow-soft">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-white shadow-soft dark:text-slate-950">
                     <Play aria-hidden="true" className="mr-1 h-7 w-7" />
                   </span>
                   <span className="px-5 text-lg font-black">כאן יוטמע סרטון היכרות עם ליאור בן ארי</span>
@@ -261,7 +261,7 @@ export function AfterStressTestPage() {
             <article key={step.title} className="rounded-[1.75rem] border border-line bg-surface p-5 shadow-card">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-xl font-black text-ink">{step.title}</h2>
-                <span className="text-3xl font-black text-accent/25">0{index + 1}</span>
+                <span aria-hidden="true" className="text-3xl font-black text-accent/25">0{index + 1}</span>
               </div>
               <p className="mt-3 leading-8 text-muted">{step.text}</p>
             </article>
@@ -322,19 +322,20 @@ export function AfterStressTestPage() {
               אפשר לשלוח הודעה קצרה עם שעה נוחה לחזרה או נושא שחשוב לכם שנכיר לפני השיחה.
             </p>
             <a
-              href="#"
+              href="https://wa.me/97236861371"
               onClick={() => trackEvent("ClickWhatsapp")}
               data-testid="whatsapp-cta"
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25"
+              aria-label="שליחת הודעה בוואטסאפ לפרקטיקה פיננסית"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 dark:text-slate-950"
             >
               <MessageCircle aria-hidden="true" className="h-5 w-5" />
               שליחת הודעה בוואטסאפ
             </a>
             <Link
-              href="/stress-test"
+              href="/"
               className="mt-3 inline-flex w-full justify-center rounded-full border border-line bg-surface px-5 py-3 font-bold text-ink shadow-card transition hover:border-accent/45 focus:outline-none focus:ring-4 focus:ring-accent/20"
             >
-              חזרה למיפוי
+              חזרה לדף הנחיתה
             </Link>
           </div>
         </div>

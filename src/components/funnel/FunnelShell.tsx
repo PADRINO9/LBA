@@ -75,7 +75,7 @@ export function FunnelShell({ children, ctaHref, ctaLabel }: FunnelShellProps) {
             {ctaHref && ctaLabel ? (
               <Link
                 href={ctaHref}
-                className="hidden rounded-full bg-accent px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 sm:inline-flex"
+                className="hidden rounded-full bg-accent px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 dark:text-slate-950 sm:inline-flex"
               >
                 {ctaLabel}
               </Link>

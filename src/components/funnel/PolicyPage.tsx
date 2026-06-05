@@ -15,7 +15,7 @@ type PolicyPageProps = {
 
 export function PolicyPage({ eyebrow, title, note, sections }: PolicyPageProps) {
   return (
-    <FunnelShell ctaHref="/stress-test" ctaLabel="חזרה למיפוי">
+    <FunnelShell ctaHref="/" ctaLabel="חזרה לדף הבית">
       <section className="px-4 py-10 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-4xl">
           <div className="rounded-[2rem] border border-line bg-surface p-5 shadow-soft sm:p-8">
@@ -67,10 +67,10 @@ export function PolicyPage({ eyebrow, title, note, sections }: PolicyPageProps) 
             </div>
 
             <Link
-              href="/stress-test"
-              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25"
+              href="/"
+              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 dark:text-slate-950"
             >
-              חזרה למיפוי
+              חזרה לדף הבית
             </Link>
           </div>
         </div>

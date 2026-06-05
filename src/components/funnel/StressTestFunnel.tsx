@@ -181,6 +181,8 @@ export function StressTestFunnel() {
   const router = useRouter();
   const privacyRef = useRef<HTMLDivElement>(null);
   const firstErrorRef = useRef<HTMLInputElement>(null);
+  const phoneErrorRef = useRef<HTMLInputElement>(null);
+  const consentErrorRef = useRef<HTMLInputElement>(null);
   const [hasStartedIntent, setHasStartedIntent] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -315,7 +317,13 @@ export function StressTestFunnel() {
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
-      firstErrorRef.current?.focus();
+      if (nextErrors.fullName) {
+        firstErrorRef.current?.focus();
+      } else if (nextErrors.phone) {
+        phoneErrorRef.current?.focus();
+      } else if (nextErrors.contactConsent) {
+        consentErrorRef.current?.focus();
+      }
       return;
     }
 
@@ -369,7 +377,7 @@ export function StressTestFunnel() {
                 type="button"
                 onClick={handleStartIntent}
                 data-testid="stress-start"
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 text-base font-extrabold text-white shadow-soft transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 text-base font-extrabold text-white shadow-soft transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 dark:text-slate-950"
               >
                 התחילו מיפוי
               </button>
@@ -478,11 +486,11 @@ export function StressTestFunnel() {
                         <span>{option.label}</span>
                         <span
                           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border ${
-                            selected ? "border-accent bg-accent text-white" : "border-line bg-surface"
+                            selected ? "border-accent bg-accent text-white dark:text-slate-950" : "border-line bg-surface"
                           }`}
                           aria-hidden="true"
                         >
-                          {selected ? <CheckCircle2 className="h-4 w-4" /> : null}
+                          {selected ? <CheckCircle2 aria-hidden="true" className="h-4 w-4" /> : null}
                         </span>
                       </button>
                     );
@@ -505,7 +513,7 @@ export function StressTestFunnel() {
                     onClick={handleNext}
                     disabled={!currentAnswer}
                     data-testid="quiz-next"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 py-2 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 py-2 font-extrabold text-white shadow-card transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 disabled:cursor-not-allowed disabled:opacity-45 dark:text-slate-950"
                   >
                     {questionIndex === QUESTIONS.length - 1 ? "הצגת תוצאה" : "המשך"}
                     <ArrowLeft aria-hidden="true" className="h-4 w-4" />
@@ -516,10 +524,12 @@ export function StressTestFunnel() {
               <ResultAndLeadForm
                 dominantCategories={dominantCategories}
                 errors={errors}
+                consentErrorRef={consentErrorRef}
                 firstErrorRef={firstErrorRef}
                 form={form}
                 onBack={handleBack}
                 onSubmit={handleSubmit}
+                phoneErrorRef={phoneErrorRef}
                 recommendedSolution={recommendedSolution}
                 totalScore={totalScore}
                 updateField={updateField}
@@ -537,10 +547,12 @@ export function StressTestFunnel() {
 type ResultAndLeadFormProps = {
   dominantCategories: string[];
   errors: LeadFormErrors;
+  consentErrorRef: RefObject<HTMLInputElement>;
   firstErrorRef: RefObject<HTMLInputElement>;
   form: LeadFormState;
   onBack: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  phoneErrorRef: RefObject<HTMLInputElement>;
   recommendedSolution: RecommendedSolution;
   totalScore: number;
   updateField: <Field extends keyof LeadFormState>(
@@ -552,10 +564,12 @@ type ResultAndLeadFormProps = {
 function ResultAndLeadForm({
   dominantCategories,
   errors,
+  consentErrorRef,
   firstErrorRef,
   form,
   onBack,
   onSubmit,
+  phoneErrorRef,
   recommendedSolution,
   totalScore,
   updateField,
@@ -596,11 +610,12 @@ function ResultAndLeadForm({
       <form
         onSubmit={onSubmit}
         noValidate
+        aria-labelledby="stress-lead-form-title"
         data-testid="lead-form"
         className="rounded-[1.75rem] border border-line bg-paper/50 p-5 shadow-card sm:p-6"
       >
         <div className="space-y-2">
-          <h3 className="text-2xl font-black text-ink">אפשר לחזור אליך?</h3>
+          <h3 id="stress-lead-form-title" className="text-2xl font-black text-ink">אפשר לחזור אליך?</h3>
           <p className="leading-7 text-muted">
             כדי שנוכל לחזור אליך לשיחת התאמה קצרה, אפשר להשאיר פרטים כאן.
           </p>
@@ -621,9 +636,11 @@ function ResultAndLeadForm({
             error={errors.phone}
             id="phone"
             inputMode="tel"
+            inputRef={phoneErrorRef}
             label="טלפון"
             onChange={(value) => updateField("phone", value)}
             required
+            type="tel"
             value={form.phone}
           />
           <Field
@@ -651,6 +668,7 @@ function ResultAndLeadForm({
             checked={form.contactConsent}
             error={errors.contactConsent}
             id="contactConsent"
+            inputRef={consentErrorRef}
             label="אני מאשר/ת יצירת קשר מצד פרקטיקה פיננסית — ליאור בן ארי."
             onChange={(checked) => updateField("contactConsent", checked)}
             required
@@ -675,7 +693,7 @@ function ResultAndLeadForm({
           <button
             type="submit"
             data-testid="lead-submit"
-            className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 text-base font-extrabold text-white shadow-soft transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25"
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 text-base font-extrabold text-white shadow-soft transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/25 dark:text-slate-950"
           >
             אפשר לחזור אליי
           </button>
@@ -695,7 +713,7 @@ type FieldProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
-  type?: "email" | "text";
+  type?: "email" | "tel" | "text";
   value: string;
 };
 
@@ -718,7 +736,7 @@ function Field({
     <div className="space-y-2">
       <label htmlFor={id} className="text-sm font-extrabold text-ink">
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
+        {required ? <span aria-hidden="true" className="text-accent"> *</span> : null}
       </label>
       <input
         ref={inputRef}
@@ -735,7 +753,7 @@ function Field({
         className="min-h-12 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-ink shadow-card transition placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
       />
       {error ? (
-        <p id={errorId} className="text-sm font-bold text-red-700 dark:text-red-300">
+        <p id={errorId} role="alert" className="text-sm font-bold text-red-700 dark:text-red-300">
           {error}
         </p>
       ) : null}
@@ -747,21 +765,23 @@ type CheckboxProps = {
   checked: boolean;
   error?: string;
   id: string;
+  inputRef?: RefObject<HTMLInputElement>;
   label: string;
   onChange: (checked: boolean) => void;
   required?: boolean;
 };
 
-function Checkbox({ checked, error, id, label, onChange, required }: CheckboxProps) {
+function Checkbox({ checked, error, id, inputRef, label, onChange, required }: CheckboxProps) {
   const errorId = `${id}-error`;
 
   return (
     <div className="space-y-2">
       <label
         htmlFor={id}
-        className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-sm font-bold leading-7 text-ink shadow-card transition hover:border-accent/45"
+        className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-sm font-bold leading-7 text-ink shadow-card transition hover:border-accent/45 focus-within:ring-4 focus-within:ring-accent/20"
       >
         <input
+          ref={inputRef}
           id={id}
           name={id}
           type="checkbox"
@@ -773,11 +793,11 @@ function Checkbox({ checked, error, id, label, onChange, required }: CheckboxPro
         />
         <span>
           {label}
-          {required ? <span className="text-accent"> *</span> : null}
+          {required ? <span aria-hidden="true" className="text-accent"> *</span> : null}
         </span>
       </label>
       {error ? (
-        <p id={errorId} className="text-sm font-bold text-red-700 dark:text-red-300">
+        <p id={errorId} role="alert" className="text-sm font-bold text-red-700 dark:text-red-300">
           {error}
         </p>
       ) : null}

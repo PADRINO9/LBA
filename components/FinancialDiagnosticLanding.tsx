@@ -281,7 +281,7 @@ function SecondaryButton({
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/65 px-4 py-2 text-sm font-semibold text-accent">
-      <Sparkles className="h-4 w-4" />
+      <Sparkles aria-hidden="true" className="h-4 w-4" />
       {children}
     </span>
   );
@@ -361,7 +361,7 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
     <section className="mx-auto grid max-w-6xl gap-8 px-4 pb-10 pt-7 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-16 lg:pt-12">
       <div className="relative z-10">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 text-sm font-semibold text-accent-dark shadow-card">
-          <ShieldCheck className="h-4 w-4" />
+          <ShieldCheck aria-hidden="true" className="h-4 w-4" />
           מיפוי חוסן פיננסי
         </div>
         <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.08] tracking-normal text-ink sm:text-5xl lg:text-[3.35rem]">
@@ -373,7 +373,7 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <PrimaryButton onClick={onStart}>
             {HERO_CTA_LABEL}
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </PrimaryButton>
           <SecondaryButton onClick={onHowItWorks}>מה בודקים במיפוי?</SecondaryButton>
         </div>
@@ -440,7 +440,7 @@ function WealthPlanningSection() {
         <div className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {["16 שנות ניסיון", "רישיון פנסיוני מוסמך", "מיפוי קצר של 120 שניות", "שיחת התאמה ללא התחייבות"].map((item) => (
             <div key={item} className="flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-4 shadow-card">
-              <ShieldCheck className="h-5 w-5 shrink-0 text-accent" />
+              <ShieldCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-accent" />
               <span className="text-sm font-bold text-ink">{item}</span>
             </div>
           ))}
@@ -459,7 +459,7 @@ function WealthPlanningSection() {
                 const Icon = topic.icon;
                 return (
                   <article key={topic.title} className="rounded-xl border border-line bg-paper/60 p-5">
-                    <Icon className="h-6 w-6 text-accent" />
+                    <Icon aria-hidden="true" className="h-6 w-6 text-accent" />
                     <h3 className="mt-4 text-lg font-bold text-ink">{topic.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted">{topic.text}</p>
                   </article>
@@ -479,7 +479,7 @@ function WealthPlanningSection() {
             </div>
             <div className="border-t border-line bg-surface p-5">
               <div className="flex items-center gap-3 text-accent-dark">
-                <Compass className="h-5 w-5" />
+                <Compass aria-hidden="true" className="h-5 w-5" />
                 <h3 className="text-xl font-bold">חוסן משפחתי לטווח ארוך</h3>
               </div>
               <p className="mt-3 text-base leading-7 text-muted">
@@ -507,7 +507,7 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
           </p>
           <PrimaryButton onClick={onStart} className="mt-7">
             לתיאום בדיקה ראשונית
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </PrimaryButton>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -515,7 +515,7 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
             <article key={step.title} className="rounded-xl border border-line bg-surface p-5 shadow-card">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-xl font-bold text-ink">{step.title}</h3>
-                <span className="text-3xl font-bold text-accent/22">0{index + 1}</span>
+                <span aria-hidden="true" className="text-3xl font-bold text-accent/22">0{index + 1}</span>
               </div>
               <p className="mt-3 text-base leading-7 text-muted">{step.text}</p>
             </article>
@@ -532,7 +532,7 @@ function QuestionsSection() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-16">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-            <HelpCircle className="h-4 w-4" />
+            <HelpCircle aria-hidden="true" className="h-4 w-4" />
             שאלות שמביאות אנשים לבדיקה
           </span>
           <h2 className="mt-5 text-3xl font-bold leading-tight sm:text-4xl">
@@ -545,7 +545,7 @@ function QuestionsSection() {
         <div className="grid gap-3">
           {criticalQuestions.map((question) => (
             <div key={question} className="flex items-start gap-3 rounded-2xl border border-white/12 bg-white/8 p-4">
-              <Check className="mt-1 h-5 w-5 shrink-0 text-white" />
+              <Check aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-white" />
               <p className="text-base font-semibold leading-7 text-white/92">{question}</p>
             </div>
           ))}
@@ -567,7 +567,7 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
           </p>
           <PrimaryButton onClick={onContinue} className="mt-7">
             {VIDEO_CTA_LABEL}
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </PrimaryButton>
         </div>
         <div className="glass-border overflow-hidden rounded-[1.5rem] bg-surface p-3 shadow-soft">
@@ -580,9 +580,10 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
               preload="metadata"
               className="h-full w-full object-cover object-[58%_center]"
               aria-label="סרטון היכרות עם ליאור בן ארי"
+              aria-describedby="landing-video-summary"
             />
           </div>
-          <p className="mt-3 text-sm leading-6 text-muted">
+          <p id="landing-video-summary" className="mt-3 text-sm leading-6 text-muted">
             תקציר נגיש לסרטון: ליאור מסביר שמיפוי החוסן הפיננסי נועד להציף נקודות תורפה שקטות, להבין האם יש מקום לבדיקה מקצועית, ולא לתת המלצה פיננסית אוטומטית.
           </p>
         </div>
@@ -693,7 +694,7 @@ function DiagnosticQuiz({
                       isActive ? "border-accent bg-accent text-white dark:text-slate-950" : "border-line bg-white text-transparent"
                     }`}
                   >
-                    <Check className="h-4 w-4" />
+                    <Check aria-hidden="true" className="h-4 w-4" />
                   </span>
                 </button>
               );
@@ -704,7 +705,7 @@ function DiagnosticQuiz({
         <div className="mt-8 flex items-center justify-between gap-3">
           {index > 0 ? (
             <SecondaryButton onClick={() => setIndex((value) => Math.max(0, value - 1))}>
-              <ArrowRight className="h-5 w-5" />
+              <ArrowRight aria-hidden="true" className="h-5 w-5" />
               חזרה
             </SecondaryButton>
           ) : (
@@ -712,7 +713,7 @@ function DiagnosticQuiz({
           )}
           <PrimaryButton onClick={goNext} disabled={!selectedForQuestion.length}>
             {index === questions.length - 1 ? "הצגת תוצאה" : "המשך"}
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </PrimaryButton>
         </div>
       </div>
@@ -816,7 +817,7 @@ function ResultAndLeadForm({
             </div>
           </div>
           <div className="mt-6 flex items-center gap-3 text-white/78">
-            <Clock3 className="h-5 w-5" />
+            <Clock3 aria-hidden="true" className="h-5 w-5" />
             <span className="text-sm">ציון אבחון פנימי: {totalScore}. הוא משמש להתאמת השיחה בלבד.</span>
           </div>
           <p className="mt-6 text-base leading-7 text-white/82">
@@ -827,10 +828,11 @@ function ResultAndLeadForm({
         <form
           onSubmit={submitLead}
           noValidate
+          aria-labelledby="landing-lead-form-title"
           aria-describedby={hasFormError ? formErrorId : undefined}
           className="glass-border rounded-[2rem] bg-surface p-6 shadow-soft sm:p-8"
         >
-          <h2 className="text-3xl font-bold leading-tight text-ink">רוצים לבדוק את זה בצורה מקצועית?</h2>
+          <h2 id="landing-lead-form-title" className="text-3xl font-bold leading-tight text-ink">רוצים לבדוק את זה בצורה מקצועית?</h2>
           <p className="mt-4 text-lg leading-8 text-muted">
             השאירו פרטים ונחזור אליכם לשיחת התאמה קצרה. מטרת השיחה היא להבין את התמונה הראשונית, לבדוק האם יש מקום להמשך בדיקה מקצועית, ולהסביר מה ניתן לעשות בצורה מסודרת ואחראית.
           </p>
@@ -868,7 +870,7 @@ function ResultAndLeadForm({
               autoComplete="off"
             />
           </div>
-          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-paper/50 p-4">
+          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-paper/50 p-4 focus-within:ring-4 focus-within:ring-accent/20">
             <input
               type="checkbox"
               checked={form.consent}
@@ -877,7 +879,7 @@ function ResultAndLeadForm({
               aria-invalid={submitted && !form.consent ? true : undefined}
               aria-describedby={submitted && !form.consent ? consentErrorId : undefined}
               ref={consentRef}
-              className="mt-1 h-5 w-5 accent-accent"
+              className="mt-1 h-5 w-5 accent-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
             />
             <span className="text-sm font-medium leading-6 text-ink">
               אני מאשר/ת יצירת קשר מצד פרקטיקה פיננסית — ליאור בן ארי.
@@ -888,12 +890,12 @@ function ResultAndLeadForm({
               ) : null}
             </span>
           </label>
-          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-surface p-4">
+          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-3xl border border-line bg-surface p-4 focus-within:ring-4 focus-within:ring-accent/20">
             <input
               type="checkbox"
               checked={form.marketingConsent}
               onChange={(event) => updateForm("marketingConsent", event.target.checked)}
-              className="mt-1 h-5 w-5 accent-accent"
+              className="mt-1 h-5 w-5 accent-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
             />
             <span className="text-sm font-medium leading-6 text-ink">
               אני מאשר/ת קבלת תכנים מקצועיים ועדכונים מפרקטיקה פיננסית. ניתן להסיר את ההסכמה בכל עת.
@@ -901,19 +903,19 @@ function ResultAndLeadForm({
           </label>
           <PrimaryButton type="submit" className="mt-6 w-full">
             אפשר לחזור אליי
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </PrimaryButton>
           <div className="mt-4 grid gap-3 text-sm font-semibold text-ink sm:grid-cols-3">
             <div className="flex items-center gap-2 rounded-xl border border-line bg-paper/45 px-3 py-3">
-              <ShieldCheck className="h-4 w-4 text-accent" />
+              <ShieldCheck aria-hidden="true" className="h-4 w-4 text-accent" />
               רישיון L-00137167
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-line bg-paper/45 px-3 py-3">
-              <LockKeyhole className="h-4 w-4 text-accent" />
+              <LockKeyhole aria-hidden="true" className="h-4 w-4 text-accent" />
               פרטיות מלאה
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-line bg-paper/45 px-3 py-3">
-              <Clock3 className="h-4 w-4 text-accent" />
+              <Clock3 aria-hidden="true" className="h-4 w-4 text-accent" />
               שיחה קצרה וברורה
             </div>
           </div>
@@ -1034,14 +1036,14 @@ function ThankYouPage({
           </div>
         </div>
         <div className="mt-7 grid gap-4 rounded-[2rem] border border-line bg-surface p-5 shadow-card sm:grid-cols-2 lg:grid-cols-4">
-          <ContactItem icon={<MapPin className="h-5 w-5" />} label="כתובת" value="יצחק מודעי 2, רחובות" />
-          <ContactItem icon={<Phone className="h-5 w-5" />} label="טלפון" value="03-686-1371" href="tel:036861371" />
-          <ContactItem icon={<Mail className="h-5 w-5" />} label="אימייל" value="office@pra-fin.co.il" href="mailto:office@pra-fin.co.il" />
+          <ContactItem icon={<MapPin aria-hidden="true" className="h-5 w-5" />} label="כתובת" value="יצחק מודעי 2, רחובות" />
+          <ContactItem icon={<Phone aria-hidden="true" className="h-5 w-5" />} label="טלפון" value="03-686-1371" href="tel:036861371" />
+          <ContactItem icon={<Mail aria-hidden="true" className="h-5 w-5" />} label="אימייל" value="office@pra-fin.co.il" href="mailto:office@pra-fin.co.il" />
           <a
             href="https://wa.me/97236861371"
             className="flex min-h-20 items-center gap-3 rounded-3xl border border-line bg-paper/60 p-4 font-semibold text-accent transition hover:border-accent/50 hover:bg-surface focus:outline-none focus:ring-4 focus:ring-accent/20"
           >
-            <MessageCircle className="h-5 w-5" />
+            <MessageCircle aria-hidden="true" className="h-5 w-5" />
             שליחת הודעה בוואטסאפ
           </a>
         </div>
@@ -1099,15 +1101,15 @@ function FAQSection() {
           </p>
           <div className="mt-6 grid gap-3 text-sm font-semibold text-ink">
             <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
-              <LockKeyhole className="h-5 w-5 text-accent" />
+              <LockKeyhole aria-hidden="true" className="h-5 w-5 text-accent" />
               הפרטים משמשים ליצירת קשר ולשיחת התאמה
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
-              <ClipboardCheck className="h-5 w-5 text-accent" />
+              <ClipboardCheck aria-hidden="true" className="h-5 w-5 text-accent" />
               אין צורך לקבל החלטה בשיחה הראשונה
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
-              <RefreshCw className="h-5 w-5 text-accent" />
+              <RefreshCw aria-hidden="true" className="h-5 w-5 text-accent" />
               אין המלצה פיננסית אוטומטית
             </div>
           </div>
@@ -1139,8 +1141,8 @@ function Footer() {
               פועל ברישיון פנסיוני מוסמך מטעם משרד האוצר | מספר רישיון: L-00137167
             </p>
             <div className="mt-3 flex flex-wrap gap-3 font-semibold text-accent" aria-label="קישורי מידע משפטי ונגישות">
-              <a href="#privacy" className="focus:outline-none focus:ring-4 focus:ring-accent/15">מדיניות פרטיות</a>
-              <a href="#accessibility" className="focus:outline-none focus:ring-4 focus:ring-accent/15">הצהרת נגישות</a>
+              <a href="/privacy" className="focus:outline-none focus:ring-4 focus:ring-accent/15">מדיניות פרטיות</a>
+              <a href="/accessibility" className="focus:outline-none focus:ring-4 focus:ring-accent/15">הצהרת נגישות</a>
             </div>
           </div>
           <p>
@@ -1159,16 +1161,19 @@ function Footer() {
           <section id="accessibility" aria-labelledby="accessibility-title">
             <h2 id="accessibility-title" className="font-bold text-ink">הצהרת נגישות</h2>
             <p>
-              הדף נבנה בהתאם לעקרונות תקנה 35 לתקנות שוויון זכויות לאנשים עם מוגבלות, ת״י 5568 והנחיות WCAG 2.0 ברמת AA. בוצעו התאמות הכוללות מבנה סמנטי, כותרות תקינות, תוויות לשדות, הודעות שגיאה נגישות, ניווט מקלדת, דילוג לתוכן המרכזי, מצבי פוקוס ברורים, ניגודיות צבעים, תמונות עם טקסט חלופי ומצב תצוגה כהה/בהיר.
+              הדף עבר התאמות טכניות בהתאם לעקרונות תקנה 35 לתקנות שוויון זכויות לאנשים עם מוגבלות, ת״י 5568 חלק 1 והנחיות WCAG 2.0 ברמת AA. בוצעו התאמות הכוללות מבנה סמנטי, כותרות תקינות, תוויות לשדות, הודעות שגיאה נגישות, ניווט מקלדת, דילוג לתוכן המרכזי, מצבי פוקוס ברורים, ניגודיות צבעים, תמונות עם טקסט חלופי ומצב תצוגה כהה/בהיר.
             </p>
             <p className="mt-2">
-              בנוסף קיימים כפתורי עזר להגדלת טקסט ולבחירת מצב בהיר/כהה. נכון לעדכון זה אין באתר קבצי PDF או מסמכים להורדה. הסרטון באתר כולל תקציר טקסטואלי, וכתוביות או תמלול מלא יטופלו בנפרד.
+              בנוסף קיימים כפתורי עזר להגדלת טקסט ולבחירת מצב בהיר/כהה, ללא הסתמכות על תוסף נגישות כפתרון עיקרי. נכון לעדכון זה אין באתר קבצי PDF או מסמכים להורדה, ואין באנר עוגיות או שכבת נגישות חיצונית.
+            </p>
+            <p className="mt-2">
+              מגבלה ידועה: הסרטון באתר כולל תקציר טקסטואלי סמוך, אך טרם נוספו כתוביות מסונכרנות או תמלול מלא. עד להשלמת רכיב זה, דפי הנחיתה הכוללים את הסרטון אינם נטענים כהצהרה מלאה של עמידה בכל דרישות המדיה של WCAG 2.0 AA.
             </p>
             <p className="mt-2">
               אם נתקלתם בקושי נגישות, ניתן לפנות אלינו בטלפון <a href="tel:036861371" className="font-semibold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">03-686-1371</a> או במייל <a href="mailto:office@pra-fin.co.il" className="font-semibold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">office@pra-fin.co.il</a>. הפנייה תיבדק ונפעל לתקן או לספק חלופה נגישה ככל האפשר.
             </p>
             <p className="mt-2">
-              ההצהרה עודכנה לאחרונה בתאריך 8 במאי 2026.
+              ההצהרה עודכנה לאחרונה בתאריך 5 ביוני 2026.
             </p>
           </section>
         </div>
