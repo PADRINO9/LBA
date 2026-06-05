@@ -180,6 +180,8 @@ const faqs = [
 ];
 
 const LEAD_FUNNEL_ENABLED = false;
+const OFFICE_PHONE_DISPLAY = "03-686-1371";
+const OFFICE_PHONE_HREF = "tel:036861371";
 const HEADER_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "התחילו מיפוי" : "לתיאום שיחה";
 const HERO_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "התחילו מיפוי של 120 שניות" : "לתיאום שיחה עם ליאור";
 const VIDEO_CTA_LABEL = LEAD_FUNNEL_ENABLED ? "המשך לאבחון" : "לתיאום שיחה";
@@ -233,6 +235,10 @@ function getScrollBehavior(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 }
 
+function primaryActionClassName(className = "") {
+  return `inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-semibold text-white shadow-card transition duration-200 hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-950 ${className}`;
+}
+
 function PrimaryButton({
   children,
   onClick,
@@ -251,10 +257,45 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-semibold text-white shadow-card transition duration-200 hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-950 ${className}`}
+      className={primaryActionClassName(className)}
     >
       {children}
     </button>
+  );
+}
+
+function PrimaryCallLink({
+  children,
+  className = "",
+  source,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  source: string;
+}) {
+  return (
+    <a
+      href={OFFICE_PHONE_HREF}
+      onClick={() => trackEvent("ClickPhone", { source })}
+      aria-label={`תיאום שיחה בטלפון ${OFFICE_PHONE_DISPLAY}`}
+      className={primaryActionClassName(className)}
+    >
+      {children}
+    </a>
+  );
+}
+
+function HeaderPhoneLink() {
+  return (
+    <a
+      href={OFFICE_PHONE_HREF}
+      onClick={() => trackEvent("ClickPhone", { source: "header_phone_icon" })}
+      aria-label={`חיוג למשרד של ליאור: ${OFFICE_PHONE_DISPLAY}`}
+      title={`חיוג למשרד: ${OFFICE_PHONE_DISPLAY}`}
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-accent shadow-card transition duration-200 hover:border-accent/60 hover:bg-paper focus:outline-none focus:ring-4 focus:ring-accent/25"
+    >
+      <Phone aria-hidden="true" className="h-5 w-5" />
+    </a>
   );
 }
 
@@ -333,12 +374,19 @@ function Header({
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:flex-nowrap sm:px-6">
         <div className="order-2 flex w-full items-center justify-between gap-2 sm:order-1 sm:w-auto sm:justify-start">
-          <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
-            {HEADER_CTA_LABEL}
-          </PrimaryButton>
+          {LEAD_FUNNEL_ENABLED ? (
+            <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
+              {HEADER_CTA_LABEL}
+            </PrimaryButton>
+          ) : (
+            <PrimaryCallLink source="header_cta" className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
+              {HEADER_CTA_LABEL}
+            </PrimaryCallLink>
+          )}
           <div className="flex shrink-0 items-center gap-2">
-          <TextSizeToggle isLargeText={isLargeText} onToggleTextSize={onToggleTextSize} />
-          <ThemeToggle isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
+            <HeaderPhoneLink />
+            <TextSizeToggle isLargeText={isLargeText} onToggleTextSize={onToggleTextSize} />
+            <ThemeToggle isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
           </div>
         </div>
         <div className="relative order-1 h-20 w-36 shrink-0 overflow-hidden rounded-xl border border-line bg-white shadow-card sm:order-2 sm:h-28 sm:w-44">
@@ -371,10 +419,17 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
           מיפוי חוסן פיננסי קצר לבעלי הכנסה גבוהה, שנועד להציף נקודות תורפה שקטות במבנה הכלכלי — עוד לפני שהן הופכות לבעיה.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <PrimaryButton onClick={onStart}>
-            {HERO_CTA_LABEL}
-            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-          </PrimaryButton>
+          {LEAD_FUNNEL_ENABLED ? (
+            <PrimaryButton onClick={onStart}>
+              {HERO_CTA_LABEL}
+              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+            </PrimaryButton>
+          ) : (
+            <PrimaryCallLink source="hero_cta">
+              {HERO_CTA_LABEL}
+              <Phone aria-hidden="true" className="h-5 w-5" />
+            </PrimaryCallLink>
+          )}
           <SecondaryButton onClick={onHowItWorks}>מה בודקים במיפוי?</SecondaryButton>
         </div>
         <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-accent-dark">
@@ -505,10 +560,17 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
           <p className="mt-4 text-lg leading-8 text-muted">
             קודם מציפים אזורי סיכון שקטים, אחר כך בודקים אם יש התאמה לשיחה מקצועית. אין המלצות אוטומטיות ואין החלטות במקום.
           </p>
-          <PrimaryButton onClick={onStart} className="mt-7">
-            לתיאום בדיקה ראשונית
-            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-          </PrimaryButton>
+          {LEAD_FUNNEL_ENABLED ? (
+            <PrimaryButton onClick={onStart} className="mt-7">
+              לתיאום בדיקה ראשונית
+              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+            </PrimaryButton>
+          ) : (
+            <PrimaryCallLink source="process_cta" className="mt-7">
+              לתיאום בדיקה ראשונית
+              <Phone aria-hidden="true" className="h-5 w-5" />
+            </PrimaryCallLink>
+          )}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {planningSteps.map((step, index) => (
@@ -565,10 +627,17 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
           <p className="mt-4 text-lg leading-8 text-muted">
             בסרטון קצר ליאור מסביר למה בעלי הכנסה גבוהה עלולים לפספס סיכונים שקטים, ומה מטרת המיפוי הראשוני.
           </p>
-          <PrimaryButton onClick={onContinue} className="mt-7">
-            {VIDEO_CTA_LABEL}
-            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-          </PrimaryButton>
+          {LEAD_FUNNEL_ENABLED ? (
+            <PrimaryButton onClick={onContinue} className="mt-7">
+              {VIDEO_CTA_LABEL}
+              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+            </PrimaryButton>
+          ) : (
+            <PrimaryCallLink source="video_cta" className="mt-7">
+              {VIDEO_CTA_LABEL}
+              <Phone aria-hidden="true" className="h-5 w-5" />
+            </PrimaryCallLink>
+          )}
         </div>
         <div className="glass-border overflow-hidden rounded-[1.5rem] bg-surface p-3 shadow-soft">
           <div className="relative h-[300px] overflow-hidden rounded-[1.15rem] bg-accent-dark dark:bg-[#0b3038] sm:h-[420px]">
@@ -1037,7 +1106,7 @@ function ThankYouPage({
         </div>
         <div className="mt-7 grid gap-4 rounded-[2rem] border border-line bg-surface p-5 shadow-card sm:grid-cols-2 lg:grid-cols-4">
           <ContactItem icon={<MapPin aria-hidden="true" className="h-5 w-5" />} label="כתובת" value="יצחק מודעי 2, רחובות" />
-          <ContactItem icon={<Phone aria-hidden="true" className="h-5 w-5" />} label="טלפון" value="03-686-1371" href="tel:036861371" />
+          <ContactItem icon={<Phone aria-hidden="true" className="h-5 w-5" />} label="טלפון" value={OFFICE_PHONE_DISPLAY} href={OFFICE_PHONE_HREF} />
           <ContactItem icon={<Mail aria-hidden="true" className="h-5 w-5" />} label="אימייל" value="office@pra-fin.co.il" href="mailto:office@pra-fin.co.il" />
           <a
             href="https://wa.me/97236861371"
@@ -1240,8 +1309,8 @@ export default function FinancialDiagnosticLanding() {
 
   const startQuiz = () => {
     if (!LEAD_FUNNEL_ENABLED) {
-      trackEvent("ContactIntent", { source: "landing_cta" });
-      document.getElementById("contact")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      trackEvent("ClickPhone", { source: "landing_cta_fallback" });
+      window.location.href = OFFICE_PHONE_HREF;
       return;
     }
     if (!quizStarted) {
