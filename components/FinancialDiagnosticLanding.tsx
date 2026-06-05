@@ -25,6 +25,15 @@ import {
   Target,
   WalletCards,
 } from "lucide-react";
+import {
+  CONTACT_TIME_OPTIONS,
+  LEAD_GENERAL_ERROR_MESSAGE,
+  LEAD_SUCCESS_MESSAGE,
+  validateLeadFormPayload,
+  type LeadFormErrors,
+  type LeadFormField,
+  type LeadFormPayload,
+} from "@/lib/leadForm";
 import { trackEvent } from "@/lib/tracking";
 import type { Category, Lead, QuizAnswer } from "@/types/lead";
 
@@ -60,6 +69,8 @@ type TextSizeProps = {
   isLargeText: boolean;
   onToggleTextSize: () => void;
 };
+
+type LeadFormStatus = "idle" | "submitting" | "success" | "error";
 
 const questions: QuizQuestion[] = [
   {
@@ -264,27 +275,6 @@ function PrimaryButton({
   );
 }
 
-function PrimaryCallLink({
-  children,
-  className = "",
-  source,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  source: string;
-}) {
-  return (
-    <a
-      href={OFFICE_PHONE_HREF}
-      onClick={() => trackEvent("ClickPhone", { source })}
-      aria-label={`תיאום שיחה בטלפון ${OFFICE_PHONE_DISPLAY}`}
-      className={primaryActionClassName(className)}
-    >
-      {children}
-    </a>
-  );
-}
-
 function HeaderPhoneLink() {
   return (
     <a
@@ -374,15 +364,9 @@ function Header({
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:flex-nowrap sm:px-6">
         <div className="order-2 flex w-full items-center justify-between gap-2 sm:order-1 sm:w-auto sm:justify-start">
-          {LEAD_FUNNEL_ENABLED ? (
-            <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
-              {HEADER_CTA_LABEL}
-            </PrimaryButton>
-          ) : (
-            <PrimaryCallLink source="header_cta" className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
-              {HEADER_CTA_LABEL}
-            </PrimaryCallLink>
-          )}
+          <PrimaryButton onClick={onStart} className="min-h-10 flex-1 px-4 py-2 text-sm sm:flex-none">
+            {HEADER_CTA_LABEL}
+          </PrimaryButton>
           <div className="flex shrink-0 items-center gap-2">
             <HeaderPhoneLink />
             <TextSizeToggle isLargeText={isLargeText} onToggleTextSize={onToggleTextSize} />
@@ -419,17 +403,10 @@ function Hero({ onStart, onHowItWorks }: { onStart: () => void; onHowItWorks: ()
           מיפוי חוסן פיננסי קצר לבעלי הכנסה גבוהה, שנועד להציף נקודות תורפה שקטות במבנה הכלכלי — עוד לפני שהן הופכות לבעיה.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          {LEAD_FUNNEL_ENABLED ? (
-            <PrimaryButton onClick={onStart}>
-              {HERO_CTA_LABEL}
-              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-            </PrimaryButton>
-          ) : (
-            <PrimaryCallLink source="hero_cta">
-              {HERO_CTA_LABEL}
-              <Phone aria-hidden="true" className="h-5 w-5" />
-            </PrimaryCallLink>
-          )}
+          <PrimaryButton onClick={onStart}>
+            {HERO_CTA_LABEL}
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+          </PrimaryButton>
           <SecondaryButton onClick={onHowItWorks}>מה בודקים במיפוי?</SecondaryButton>
         </div>
         <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-accent-dark">
@@ -560,17 +537,10 @@ function ProcessSection({ onStart }: { onStart: () => void }) {
           <p className="mt-4 text-lg leading-8 text-muted">
             קודם מציפים אזורי סיכון שקטים, אחר כך בודקים אם יש התאמה לשיחה מקצועית. אין המלצות אוטומטיות ואין החלטות במקום.
           </p>
-          {LEAD_FUNNEL_ENABLED ? (
-            <PrimaryButton onClick={onStart} className="mt-7">
-              לתיאום בדיקה ראשונית
-              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-            </PrimaryButton>
-          ) : (
-            <PrimaryCallLink source="process_cta" className="mt-7">
-              לתיאום בדיקה ראשונית
-              <Phone aria-hidden="true" className="h-5 w-5" />
-            </PrimaryCallLink>
-          )}
+          <PrimaryButton onClick={onStart} className="mt-7">
+            לתיאום בדיקה ראשונית
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+          </PrimaryButton>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {planningSteps.map((step, index) => (
@@ -627,17 +597,10 @@ function VideoSection({ onContinue }: { onContinue: () => void }) {
           <p className="mt-4 text-lg leading-8 text-muted">
             בסרטון קצר ליאור מסביר למה בעלי הכנסה גבוהה עלולים לפספס סיכונים שקטים, ומה מטרת המיפוי הראשוני.
           </p>
-          {LEAD_FUNNEL_ENABLED ? (
-            <PrimaryButton onClick={onContinue} className="mt-7">
-              {VIDEO_CTA_LABEL}
-              <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-            </PrimaryButton>
-          ) : (
-            <PrimaryCallLink source="video_cta" className="mt-7">
-              {VIDEO_CTA_LABEL}
-              <Phone aria-hidden="true" className="h-5 w-5" />
-            </PrimaryCallLink>
-          )}
+          <PrimaryButton onClick={onContinue} className="mt-7">
+            {VIDEO_CTA_LABEL}
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+          </PrimaryButton>
         </div>
         <div className="glass-border overflow-hidden rounded-[1.5rem] bg-surface p-3 shadow-soft">
           <div className="relative h-[300px] overflow-hidden rounded-[1.15rem] bg-accent-dark dark:bg-[#0b3038] sm:h-[420px]">
@@ -861,7 +824,6 @@ function ResultAndLeadForm({
       marketingConsent: form.marketingConsent,
     };
 
-    console.log("Lead object", lead);
     trackEvent("Lead", { id: lead.id, recommendedSolution, totalScore, dominantCategories });
     onLead(lead);
   };
@@ -1158,6 +1120,491 @@ function ContactItem({ icon, label, value, href }: { icon: React.ReactNode; labe
   );
 }
 
+const leadFormFieldLabels: Record<LeadFormField, string> = {
+  fullName: "שם מלא",
+  phone: "טלפון",
+  email: "מייל",
+  preferredContactTime: "זמן נוח לחזרה",
+  message: "הודעה חופשית",
+};
+
+const leadFormFieldOrder: LeadFormField[] = ["fullName", "phone", "email", "preferredContactTime", "message"];
+
+function LeadContactSection({ headingRef }: { headingRef: React.RefObject<HTMLHeadingElement> }) {
+  const [form, setForm] = useState<LeadFormPayload>({
+    fullName: "",
+    phone: "",
+    email: "",
+    preferredContactTime: "",
+    message: "",
+    website: "",
+    pageUrl: "",
+  });
+  const [errors, setErrors] = useState<LeadFormErrors>({});
+  const [status, setStatus] = useState<LeadFormStatus>("idle");
+  const [serverMessage, setServerMessage] = useState("");
+  const fullNameRef = useRef<HTMLInputElement | null>(null);
+  const phoneRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const preferredContactTimeRef = useRef<HTMLSelectElement | null>(null);
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
+  const statusRef = useRef<HTMLDivElement | null>(null);
+  const errorSummaryId = useId();
+  const successMessageId = useId();
+  const isSubmitting = status === "submitting";
+  const errorEntries = leadFormFieldOrder
+    .filter((field) => errors[field])
+    .map((field) => [field, errors[field] as string] as const);
+
+  const getFieldElement = (field: LeadFormField) => {
+    if (field === "fullName") return fullNameRef.current;
+    if (field === "phone") return phoneRef.current;
+    if (field === "email") return emailRef.current;
+    if (field === "preferredContactTime") return preferredContactTimeRef.current;
+    return messageRef.current;
+  };
+
+  const focusFirstError = (nextErrors: LeadFormErrors) => {
+    const firstInvalidField = leadFormFieldOrder.find((field) => nextErrors[field]);
+    requestAnimationFrame(() => {
+      if (firstInvalidField) {
+        getFieldElement(firstInvalidField)?.focus();
+      } else {
+        statusRef.current?.focus();
+      }
+    });
+  };
+
+  const updateField = (field: keyof LeadFormPayload, value: string) => {
+    setForm((previous) => ({ ...previous, [field]: value }));
+    if (field in errors) {
+      setErrors((previous) => {
+        const next = { ...previous };
+        delete next[field as LeadFormField];
+        return next;
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      fullName: "",
+      phone: "",
+      email: "",
+      preferredContactTime: "",
+      message: "",
+      website: "",
+      pageUrl: "",
+    });
+  };
+
+  const submitLeadForm = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const payload = {
+      ...form,
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
+    };
+    const validation = validateLeadFormPayload(payload);
+
+    setServerMessage("");
+
+    if (!validation.values) {
+      setStatus("idle");
+      setErrors(validation.errors);
+      focusFirstError(validation.errors);
+      return;
+    }
+
+    setErrors({});
+    setStatus("submitting");
+
+    try {
+      const response = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        message?: string;
+        errors?: LeadFormErrors;
+      };
+
+      if (!response.ok || !data.ok) {
+        if (data.errors && Object.keys(data.errors).length > 0) {
+          setStatus("idle");
+          setErrors(data.errors);
+          focusFirstError(data.errors);
+          return;
+        }
+
+        setStatus("error");
+        setServerMessage(data.message || LEAD_GENERAL_ERROR_MESSAGE);
+        requestAnimationFrame(() => statusRef.current?.focus());
+        return;
+      }
+
+      trackEvent("LeadFormSubmit", { source: "landing_lead_form" });
+      setStatus("success");
+      setServerMessage(data.message || LEAD_SUCCESS_MESSAGE);
+      resetForm();
+      requestAnimationFrame(() => statusRef.current?.focus());
+    } catch {
+      setStatus("error");
+      setServerMessage(LEAD_GENERAL_ERROR_MESSAGE);
+      requestAnimationFrame(() => statusRef.current?.focus());
+    }
+  };
+
+  return (
+    <section id="lead-form" className="border-y border-line bg-surface/60">
+      <div className="mx-auto grid max-w-6xl gap-7 px-4 py-14 sm:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:py-20">
+        <div>
+          <SectionLabel>תיאום שיחה</SectionLabel>
+          <h2
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-5 text-3xl font-bold leading-tight text-ink outline-none focus:ring-4 focus:ring-accent/15 sm:text-4xl"
+          >
+            השאירו פרטים ונחזור אליכם לתיאום שיחה
+          </h2>
+          <p className="mt-4 text-lg leading-8 text-muted">
+            מלאו את הפרטים, וליאור או המשרד יחזרו אליכם כדי להבין את הצורך הראשוני ולתאם זמן נוח לשיחה.
+          </p>
+          <div className="mt-7 grid gap-3 text-sm font-semibold text-ink">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
+              <ShieldCheck aria-hidden="true" className="h-5 w-5 text-accent" />
+              הפרטים נשלחים ישירות למשרד פרקטיקה פיננסית
+            </div>
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
+              <LockKeyhole aria-hidden="true" className="h-5 w-5 text-accent" />
+              אין צורך לצרף מסמכים בשלב הזה
+            </div>
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
+              <Clock3 aria-hidden="true" className="h-5 w-5 text-accent" />
+              ננסה לחזור בזמן שבחרתם
+            </div>
+          </div>
+        </div>
+
+        <form
+          onSubmit={submitLeadForm}
+          noValidate
+          aria-labelledby="lead-form-title"
+          aria-describedby={
+            errorEntries.length > 0
+              ? errorSummaryId
+              : status === "success"
+                ? successMessageId
+                : undefined
+          }
+          className="glass-border relative rounded-[2rem] bg-surface p-6 shadow-soft sm:p-8"
+        >
+          <h3 id="lead-form-title" className="text-2xl font-bold leading-tight text-ink sm:text-3xl">
+            פרטים לחזרה
+          </h3>
+          <p className="mt-3 text-base leading-7 text-muted">
+            שדות חובה מסומנים בכוכבית. ההודעה החופשית אינה חובה.
+          </p>
+
+          <div className="absolute left-[-10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+            <label htmlFor="lead-website">אתר</label>
+            <input
+              id="lead-website"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={form.website}
+              onChange={(event) => updateField("website", event.target.value)}
+            />
+          </div>
+
+          {errorEntries.length > 0 ? (
+            <div
+              id={errorSummaryId}
+              ref={statusRef}
+              tabIndex={-1}
+              role="alert"
+              className="mt-5 rounded-2xl border border-accent-dark bg-paper/80 p-4 text-sm font-semibold leading-6 text-ink outline-none focus:ring-4 focus:ring-accent/20"
+            >
+              <p>יש לתקן את השדות הבאים:</p>
+              <ul className="mt-2 list-inside list-disc">
+                {errorEntries.map(([field, error]) => (
+                  <li key={field}>
+                    {leadFormFieldLabels[field]}: {error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {status === "success" ? (
+            <div
+              id={successMessageId}
+              ref={statusRef}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              className="mt-5 rounded-2xl border border-accent/30 bg-paper/80 p-4 text-sm font-bold leading-6 text-accent-dark outline-none focus:ring-4 focus:ring-accent/20"
+            >
+              {serverMessage || LEAD_SUCCESS_MESSAGE}
+            </div>
+          ) : null}
+
+          {status === "error" ? (
+            <div
+              ref={statusRef}
+              tabIndex={-1}
+              role="alert"
+              className="mt-5 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm font-bold leading-6 text-red-800 outline-none focus:ring-4 focus:ring-red-200 dark:border-red-400 dark:bg-red-950 dark:text-red-200"
+            >
+              {serverMessage || LEAD_GENERAL_ERROR_MESSAGE}
+            </div>
+          ) : null}
+
+          <div className="mt-7 grid gap-4 sm:grid-cols-2">
+            <LeadTextInput
+              id="lead-full-name"
+              label="שם מלא"
+              value={form.fullName}
+              onChange={(value) => updateField("fullName", value)}
+              error={errors.fullName}
+              autoComplete="name"
+              inputRef={fullNameRef}
+              required
+            />
+            <LeadTextInput
+              id="lead-phone"
+              label="טלפון"
+              value={form.phone}
+              onChange={(value) => updateField("phone", value)}
+              error={errors.phone}
+              autoComplete="tel"
+              inputMode="tel"
+              inputRef={phoneRef}
+              required
+              type="tel"
+            />
+            <LeadTextInput
+              id="lead-email"
+              label="מייל"
+              value={form.email}
+              onChange={(value) => updateField("email", value)}
+              error={errors.email}
+              autoComplete="email"
+              inputMode="email"
+              inputRef={emailRef}
+              required
+              type="email"
+            />
+            <LeadSelect
+              id="lead-contact-time"
+              label="זמן נוח לחזרה"
+              value={form.preferredContactTime}
+              onChange={(value) => updateField("preferredContactTime", value)}
+              error={errors.preferredContactTime}
+              selectRef={preferredContactTimeRef}
+              required
+            />
+          </div>
+
+          <LeadTextarea
+            id="lead-message"
+            label="הודעה חופשית"
+            value={form.message}
+            onChange={(value) => updateField("message", value)}
+            error={errors.message}
+            textareaRef={messageRef}
+            maxLength={500}
+          />
+
+          <PrimaryButton type="submit" disabled={isSubmitting} className="mt-6 w-full">
+            {isSubmitting ? "שולח..." : "שליחת פרטים"}
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+          </PrimaryButton>
+          <p className="mt-4 text-sm leading-6 text-muted">
+            אפשר גם ליצור קשר ישירות בטלפון <a href={OFFICE_PHONE_HREF} className="font-bold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">{OFFICE_PHONE_DISPLAY}</a> או במייל <a href="mailto:office@pra-fin.co.il" className="font-bold text-accent focus:outline-none focus:ring-4 focus:ring-accent/15">office@pra-fin.co.il</a>.
+          </p>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function RequiredMark() {
+  return (
+    <span className="text-accent" aria-hidden="true">
+      {" "}
+      *
+    </span>
+  );
+}
+
+function LeadTextInput({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  autoComplete,
+  inputMode,
+  inputRef,
+  required,
+  type = "text",
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  autoComplete?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  inputRef?: React.Ref<HTMLInputElement>;
+  required?: boolean;
+  type?: string;
+}) {
+  const errorId = `${id}-error`;
+
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-ink">
+        {label}
+        {required ? <RequiredMark /> : null}
+      </label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        ref={inputRef}
+        required={required}
+        aria-required={required}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        className={`h-12 w-full rounded-xl border bg-paper/35 px-4 py-3 text-base text-ink outline-none transition placeholder:text-muted/60 focus:border-accent focus:bg-surface focus:ring-4 focus:ring-accent/15 ${
+          error ? "border-accent-dark" : "border-line"
+        }`}
+      />
+      {error ? (
+        <p id={errorId} role="alert" className="mt-1 text-sm font-bold text-accent-dark">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function LeadSelect({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  required,
+  selectRef,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  required?: boolean;
+  selectRef?: React.Ref<HTMLSelectElement>;
+}) {
+  const errorId = `${id}-error`;
+
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-ink">
+        {label}
+        {required ? <RequiredMark /> : null}
+      </label>
+      <select
+        id={id}
+        name={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        ref={selectRef}
+        required={required}
+        aria-required={required}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={`h-12 w-full rounded-xl border bg-paper/35 px-4 py-3 text-base text-ink outline-none transition focus:border-accent focus:bg-surface focus:ring-4 focus:ring-accent/15 ${
+          error ? "border-accent-dark" : "border-line"
+        }`}
+      >
+        <option value="">בחרו זמן נוח</option>
+        {CONTACT_TIME_OPTIONS.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      {error ? (
+        <p id={errorId} role="alert" className="mt-1 text-sm font-bold text-accent-dark">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function LeadTextarea({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  maxLength,
+  textareaRef,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  maxLength: number;
+  textareaRef?: React.Ref<HTMLTextAreaElement>;
+}) {
+  const errorId = `${id}-error`;
+  const countId = `${id}-count`;
+
+  return (
+    <div className="mt-4">
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-ink">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        name={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        ref={textareaRef}
+        maxLength={maxLength + 50}
+        aria-invalid={Boolean(error)}
+        aria-describedby={`${countId}${error ? ` ${errorId}` : ""}`}
+        rows={4}
+        className={`min-h-32 w-full resize-y rounded-xl border bg-paper/35 px-4 py-3 text-base leading-7 text-ink outline-none transition placeholder:text-muted/60 focus:border-accent focus:bg-surface focus:ring-4 focus:ring-accent/15 ${
+          error ? "border-accent-dark" : "border-line"
+        }`}
+      />
+      <p id={countId} className="mt-1 text-sm font-semibold text-muted">
+        {value.length}/{maxLength} תווים
+      </p>
+      {error ? (
+        <p id={errorId} role="alert" className="mt-1 text-sm font-bold text-accent-dark">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function FAQSection() {
   return (
     <section id="faq" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
@@ -1224,7 +1671,7 @@ function Footer() {
           <section id="privacy" aria-labelledby="privacy-title">
             <h2 id="privacy-title" className="font-bold text-ink">מדיניות פרטיות</h2>
             <p>
-              הפרטים שתשאירו ישמשו ליצירת קשר ולבדיקת התאמה ראשונית בלבד. לא מתבצעת בשלב זה שליחה למערכות CRM, דיוור, Google Sheets, Supabase או Make.
+              הפרטים שתשאירו בטופס תיאום השיחה ישמשו ליצירת קשר ולבדיקת התאמה ראשונית בלבד, ויישלחו למשרד באמצעות ספק שליחת דואר אלקטרוני מאובטח. לא מתבצעת מכירה של מידע אישי.
             </p>
           </section>
           <section id="accessibility" aria-labelledby="accessibility-title">
@@ -1265,6 +1712,7 @@ export default function FinancialDiagnosticLanding() {
   const [thankYou, setThankYou] = useState(false);
   const quizRef = useRef<HTMLDivElement | null>(null);
   const detailsRef = useRef<HTMLDivElement | null>(null);
+  const leadFormHeadingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("lior-theme");
@@ -1309,8 +1757,9 @@ export default function FinancialDiagnosticLanding() {
 
   const startQuiz = () => {
     if (!LEAD_FUNNEL_ENABLED) {
-      trackEvent("ClickPhone", { source: "landing_cta_fallback" });
-      window.location.href = OFFICE_PHONE_HREF;
+      trackEvent("LeadFormOpen", { source: "landing_cta" });
+      leadFormHeadingRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      requestAnimationFrame(() => leadFormHeadingRef.current?.focus());
       return;
     }
     if (!quizStarted) {
@@ -1327,7 +1776,8 @@ export default function FinancialDiagnosticLanding() {
     setThankYou(false);
     setResult(null);
     if (!LEAD_FUNNEL_ENABLED) {
-      document.getElementById("contact")?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      leadFormHeadingRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "start" });
+      requestAnimationFrame(() => leadFormHeadingRef.current?.focus());
       return;
     }
     setQuizStarted(true);
@@ -1371,6 +1821,7 @@ export default function FinancialDiagnosticLanding() {
       <ProcessSection onStart={startQuiz} />
       <QuestionsSection />
       <VideoSection onContinue={startQuiz} />
+      <LeadContactSection headingRef={leadFormHeadingRef} />
       {LEAD_FUNNEL_ENABLED ? (
         <>
           <div ref={quizRef}>

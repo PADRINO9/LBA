@@ -347,8 +347,12 @@ export function StressTestFunnel() {
       marketingConsent: form.marketingConsent,
     };
 
-    console.log("Lead object", lead);
-    trackEvent("LeadSubmit", lead as unknown as Record<string, unknown>);
+    trackEvent("LeadSubmit", {
+      id: lead.id,
+      totalScore,
+      dominantCategories,
+      recommendedSolution,
+    });
     router.push("/after-stress-test");
   }
 
