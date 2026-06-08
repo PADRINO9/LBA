@@ -1309,7 +1309,7 @@ function LeadContactSection({ headingRef }: { headingRef: React.RefObject<HTMLHe
             שדות חובה מסומנים בכוכבית. ההודעה החופשית אינה חובה.
           </p>
 
-          <div className="absolute left-[-10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+          <div className="sr-only" aria-hidden="true">
             <label htmlFor="lead-website">אתר</label>
             <input
               id="lead-website"
